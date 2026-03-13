@@ -1,40 +1,39 @@
-# HQ Task Files
+# HQ 任务文件
 
-Task files live under `runtime/tasks/`.
+任务文件存放在 `runtime/tasks/` 下。
 
-## Purpose
+## 目的
 
-They replace the missing Slack-style thread isolation with a durable local record keyed by `TID`.
+它们用带 `TID` 的耐用本地记录，替代 Slack 风格的线程隔离。
 
-## File Shape
+## 文件结构
 
-Each task file should keep:
+每个任务文件应保留：
 
-- the current task block
-- the current plan
-- the latest checkpoint
-- the final closeout
+- 当前任务块
+- 当前计划
+- 最新进度记录
+- 最终结项
 
-Keep the file compact. Avoid pasting full chat history.
+保持文件紧凑，避免粘贴整段聊天历史。
 
-## Naming
+## 命名
 
-Use:
+格式：
 
 ```text
 TID-YYYYMMDD-HHMM-shortslug.md
 ```
 
-## Recommended Workflow
+## 推荐流程
 
-1. create a task file with `new-hq-task.ps1`
-2. update the visible reply using a task block
-3. add a checkpoint only when needed
-4. finish with a closeout
+1. 用 `new-hq-task.ps1` 创建任务文件
+2. 用任务块更新对外可见回复
+3. 只在必要时添加进度记录
+4. 最后用结项收尾
 
-## Notes
+## 备注
 
-- `Q` items can often skip task files
-- `S` items should stop at approval boundaries even if a task file exists
-- a closeout should tell the next operator what matters without reopening the whole conversation
-
+- `Q` 类任务通常可以跳过任务文件
+- `S` 类任务即使有任务文件，也必须在审批边界暂停
+- 一条好的结项，应让下一位接手者不用重看整段上下文

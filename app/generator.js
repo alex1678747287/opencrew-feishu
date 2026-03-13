@@ -110,10 +110,10 @@ function renderCustomIdentity(role) {
   return [
     "# IDENTITY.md",
     "",
-    `- Name: ${role.name}`,
-    `- Role: ${role.role}`,
-    `- Vibe: ${role.vibe}`,
-    `- Emoji: ${role.emoji}`
+    `- 名称: ${role.name}`,
+    `- 角色: ${role.role}`,
+    `- 风格: ${role.vibe}`,
+    `- 标识: ${role.emoji}`
   ].join("\n");
 }
 
@@ -123,7 +123,7 @@ function renderCustomSoul(role) {
     "",
     role.mission,
     "",
-    "## Operating Style",
+    "## 工作方式",
     "",
     ...role.responsibilities.map((item) => `- ${item}`)
   ].join("\n");
@@ -138,9 +138,9 @@ function renderCustomAgents(role) {
   return [
     "# AGENTS.md",
     "",
-    "## Startup",
+    "## 启动",
     "",
-    "Read:",
+    "先读取：",
     "",
     "1. `IDENTITY.md`",
     "2. `SOUL.md`",
@@ -149,13 +149,13 @@ function renderCustomAgents(role) {
     `5. \`${sharedBase}/CHECKPOINT_TEMPLATE.md\``,
     `6. \`${sharedBase}/CLOSEOUT_TEMPLATE.md\``,
     "",
-    "## Responsibilities",
+    "## 职责",
     "",
     ...responsibilityLines,
     "",
-    "## Feishu Mode",
+    "## 飞书模式",
     "",
-    "Use `TID` for non-trivial work, keep context compact, and leave a checkpoint or closeout when the task matters."
+    "遇到非简单任务时使用 `TID`，保持上下文紧凑，并在任务重要时留下进度记录或结项总结。"
   ].join("\n");
 }
 

@@ -1,45 +1,44 @@
-# Shared System Rules
+# 共享系统规则
 
-These rules are shared by all OpenCrew-Feishu workspaces in this scaffold.
+这些规则由此 scaffold 中的所有 OpenCrew-Feishu 工作区共享。
 
-## Working Model
+## 工作模型
 
-- One task has one `TID`.
-- One visible reply should represent the current best state.
-- The system should prefer clarity over theater.
-- In Feishu, task isolation is achieved by structured summaries, not by assuming perfect thread isolation.
+- 一个任务对应一个 `TID`。
+- 一次对外可见回复应代表当前最佳状态。
+- 系统应优先追求清晰，而不是表演感。
+- 在飞书里，任务隔离靠结构化摘要实现，而不是假设线程隔离天然完美。
 
 ## QAPS
 
-- `Q`: explain, read, summarize, answer
-- `A`: perform a bounded action in one working session
-- `P`: handle a multi-step or multi-artifact effort
-- `S`: treat as sensitive, strategic, public-facing, or irreversible
+- `Q`：解释、阅读、总结、回答
+- `A`：在一个工作会话内完成有边界的动作
+- `P`：处理多步骤或多产物的任务
+- `S`：视为敏感、战略级、公开面向或不可逆任务
 
-## Autonomy Ladder
+## 自主等级
 
-- `L0`: read, inspect, summarize
-- `L1`: make reversible internal changes
-- `L2`: perform bounded execution with clear rollback
-- `L3`: require explicit human approval before external, destructive, or irreversible action
+- `L0`：读取、检查、总结
+- `L1`：进行可逆的内部修改
+- `L2`：执行边界明确且可回滚的操作
+- `L3`：在外部、破坏性或不可逆动作前必须获得人工明确批准
 
-Default mapping:
+默认映射：
 
-- `Q` -> `L0` or `L1`
-- `A` -> `L1` or `L2`
-- `P` -> `L1` or `L2`, with checkpoints
+- `Q` -> `L0` 或 `L1`
+- `A` -> `L1` 或 `L2`
+- `P` -> `L1` 或 `L2`，并保留进度记录
 - `S` -> `L3`
 
-## Feishu Adaptation
+## 飞书适配
 
-- Use `TID` in the first visible status block.
-- Keep one active owner at a time.
-- If dedicated role groups are introduced later, keep one active task per role group unless your own routing discipline is proven stable.
+- 在第一条可见状态块中带上 `TID`。
+- 同一时刻只保留一个活跃负责人。
+- 如果未来引入专属角色群，在路由纪律还未稳定前，每个角色群同一时刻只处理一个活跃任务。
 
-## Token Discipline
+## Token 控制
 
-- Start with the smallest capable role.
-- Summaries should be passed forward, not raw history.
-- Review only when risk or complexity justifies it.
-- Do not multiply agents for appearance.
-
+- 从最小可胜任的角色开始。
+- 传递摘要，不传递整段原始历史。
+- 只有在风险或复杂度足够时才做审查。
+- 不要为了看起来像团队就无意义增加 agent。

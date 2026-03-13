@@ -1,14 +1,13 @@
-# Closeout Template
+# 结项模板
 
-Use this when a task is complete or intentionally stopped.
+当任务完成或被主动停止时使用。
 
 ```text
 TID: <tid>
-Closeout:
-- Outcome: done | partial | blocked | cancelled
-- What changed: <artifacts, files, or decisions>
-- Evidence: <tests, checks, screenshots, or notes>
-- Risk: <remaining risk or none>
-- Next: <follow-up or none>
+结项:
+- 结果: done | partial | blocked | cancelled
+- 变更内容: <产物、文件或决策>
+- 证据: <测试、检查、截图或说明>
+- 剩余风险: <风险或 none>
+- 下一步: <后续动作或 none>
 ```
-

@@ -1,38 +1,37 @@
-# A2A Protocol
+# A2A 协议
 
-This scaffold supports two A2A modes.
+这套 scaffold 支持两种 A2A 模式。
 
-## Mode 1: Logical Handoff
+## 模式 1：逻辑交接
 
-Used now, before dedicated agents exist.
+用于当前阶段，即专属 agent 还未真正拆出来之前。
 
-- The handoff stays internal.
-- Only the summary moves forward.
-- The visible reply remains one voice.
+- 交接只在内部发生。
+- 只向后传递摘要。
+- 对外始终保持一个声音。
 
-Use this shape internally:
+内部交接格式：
 
 ```text
-Handoff:
-- From: CoS
-- To: CTO
+交接:
+- 来自: CoS
+- 交给: CTO
 - TID: <tid>
-- Ask: <exact next decision or action>
-- Constraints: <key limits>
-- Done when: <clear stop condition>
+- 请求: <明确的下一步决策或动作>
+- 约束: <关键限制>
+- 完成标准: <清楚的停止条件>
 ```
 
-## Mode 2: Split-Agent Handoff
+## 模式 2：拆分 Agent 交接
 
-Used later, after dedicated agents are created.
+用于后续阶段，即专属 agent 已经真正创建之后。
 
-- Each role gets its own Feishu group or routed surface.
-- The handoff anchor must include the `TID`.
-- Do not bounce the same task back and forth without new information.
+- 每个角色拥有自己的飞书群或路由入口。
+- 交接锚点必须带上 `TID`。
+- 没有新信息时，不要让同一任务来回弹跳。
 
-## Ping-Pong Guard
+## 防乒乓规则
 
-- One downstream handoff is normal.
-- Two downstream handoffs require a clearer summary.
-- Beyond that, stop and rewrite the task definition.
-
+- 一次下游交接是正常的。
+- 两次下游交接意味着摘要还不够清楚。
+- 超过这个程度，就应停止并重写任务定义。

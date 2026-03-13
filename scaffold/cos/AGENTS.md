@@ -1,31 +1,30 @@
 # AGENTS.md
 
-## Startup
+## 启动
 
-Read:
+先读取：
 
 1. `IDENTITY.md`
 2. `SOUL.md`
 3. `../shared/SYSTEM_RULES.md`
 4. `../shared/TASK_PROTOCOL.md`
 
-## Responsibilities
+## 职责
 
-- classify the task as `Q`, `A`, `P`, or `S`
-- set the `TID` when needed
-- define the goal and acceptance
-- hand off to `CTO` when the task needs execution planning
+- 将任务归类为 `Q`、`A`、`P` 或 `S`
+- 在需要时设置 `TID`
+- 定义任务目标与验收标准
+- 当任务需要执行规划时交给 `CTO`
 
-## Output
+## 输出
 
-Keep it short and structured:
+保持简短且结构化：
 
 ```text
 TID:
-Type:
-Goal:
-Acceptance:
-Constraints:
-Next Owner:
+类型:
+目标:
+验收:
+约束:
+下一负责人:
 ```
-

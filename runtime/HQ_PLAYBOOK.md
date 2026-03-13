@@ -1,68 +1,67 @@
-# HQ Playbook
+# HQ 操作手册
 
-This is the operational playbook for the current single visible HQ bot.
+这是当前单一对外可见 HQ 机器人的操作手册。
 
-## Goal
+## 目标
 
-Run the OpenCrew pattern in Feishu without requiring dedicated role agents yet.
+在飞书里运行 OpenCrew 协作模式，同时又不要求一开始就拆出全部专属角色 agent。
 
-## Default Shape
+## 默认形态
 
-- one visible HQ bot
-- internal logical roles only
-- `TID` for non-trivial tasks
-- compact checkpoints
-- one closeout per finished task
+- 一个对外可见的 HQ 机器人
+- 仅存在内部逻辑角色
+- 对非简单任务使用 `TID`
+- 使用紧凑的进度记录
+- 每个完成任务保留一条结项
 
-## Internal Role Order
+## 内部角色顺序
 
-Use the smallest sufficient sequence:
+采用最小可用顺序：
 
 1. `CoS`
-   Clarify the ask, name the outcome, set acceptance.
+   澄清请求、定义结果、设定验收标准。
 2. `CTO`
-   Scope the work and define the next owner.
+   划定范围并定义下一位负责人。
 3. `Builder`
-   Execute, validate, and record evidence.
+   执行、验证、保留证据。
 4. `Ops`
-   Only when the change is risky enough to justify review.
+   只有在风险足够高时才介入审查。
 5. `KO`
-   Only when something durable is worth saving.
+   只有在确实值得沉淀时才介入。
 
-## When To Create A Task File
+## 何时创建任务文件
 
-Create a task file for:
+以下情况创建任务文件：
 
-- any `A`, `P`, or `S` item
-- anything that will survive more than one visible reply
-- anything likely to need a checkpoint
+- 任何 `A`、`P` 或 `S` 类任务
+- 任何会跨越多条可见回复的任务
+- 任何大概率需要进度记录的任务
 
-You usually do not need a task file for a pure `Q`.
+纯 `Q` 类任务通常不需要任务文件。
 
-## Local Commands
+## 本地命令
 
-Create a task file:
+创建任务文件：
 
 ```powershell
 & 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\new-hq-task.ps1' -Type A -Goal 'Summarize the latest deployment issue' -Acceptance 'One clear summary and next step'
 ```
 
-Emit a checkpoint block:
+输出进度块：
 
 ```powershell
 & 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\emit-hq-block.ps1' -Mode checkpoint -Tid 'TID-20260313-1600-demo' -Status on_track -Completed 'Read logs and isolated the failing step' -Next 'Patch the config and re-run the health check'
 ```
 
-Emit a closeout block:
+输出结项块：
 
 ```powershell
 & 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\emit-hq-block.ps1' -Mode closeout -Tid 'TID-20260313-1600-demo' -Outcome done -Changed 'Added the Feishu HQ scaffold' -Evidence 'Script syntax checked and generator dry-run passed'
 ```
 
-## Human-Facing Discipline
+## 对外纪律
 
-- never stage fake internal chatter in front of users
-- prefer a short task block to a long explanation
-- show checkpoints only when they add coordination value
-- always finish non-trivial work with a closeout
-
+- 不要在用户面前表演式展示内部聊天
+- 优先用简短任务块，不写冗长解释
+- 只有在进度记录能增加协同价值时才展示
+- 所有非简单任务都必须以结项收尾

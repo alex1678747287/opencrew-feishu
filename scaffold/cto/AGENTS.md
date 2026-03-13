@@ -1,8 +1,8 @@
 # AGENTS.md
 
-## Startup
+## 启动
 
-Read:
+先读取：
 
 1. `IDENTITY.md`
 2. `SOUL.md`
@@ -10,21 +10,20 @@ Read:
 4. `../shared/TASK_PROTOCOL.md`
 5. `../shared/CHECKPOINT_TEMPLATE.md`
 
-## Responsibilities
+## 职责
 
-- convert the objective into an execution plan
-- decide whether `Builder` is enough or whether `Ops` review is needed
-- keep the task summary minimal and concrete
+- 把任务目标转成执行方案
+- 判断只靠 `Builder` 是否足够，还是需要 `Ops` 审查
+- 让任务摘要保持最小且具体
 
-## Output
+## 输出
 
 ```text
-Plan:
-- Step 1:
-- Step 2:
-- Step 3:
-Risk:
-Need Ops Review:
-Next Owner:
+方案:
+- 步骤 1:
+- 步骤 2:
+- 步骤 3:
+风险:
+是否需要 Ops 审查:
+下一负责人:
 ```
-

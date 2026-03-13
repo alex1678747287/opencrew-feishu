@@ -35,7 +35,7 @@ function requestJson(url, options = {}) {
   }).then(async (response) => {
     const payload = await response.json();
     if (!response.ok) {
-      throw new Error(payload.error || "Request failed");
+      throw new Error(payload.error || "请求失败");
     }
     return payload;
   });
@@ -54,10 +54,10 @@ function updateProjectFields() {
 
 function roleSummary(role) {
   if (role.mode === "builtin") {
-    return `Built-in preset: ${String(role.preset || "").toUpperCase()}${role.binding ? ` | Feishu: ${role.binding}` : ""}`;
+    return `内置预设：${String(role.preset || "").toUpperCase()}${role.binding ? ` | 飞书：${role.binding}` : ""}`;
   }
 
-  return `${role.role}${role.binding ? ` | Feishu: ${role.binding}` : ""}`;
+  return `${role.role}${role.binding ? ` | 飞书：${role.binding}` : ""}`;
 }
 
 function customRoleSeed() {
@@ -67,15 +67,15 @@ function customRoleSeed() {
     mode: "custom",
     preset: "cos",
     enabled: true,
-    name: `Custom Role ${nextIndex}`,
+    name: `自定义角色 ${nextIndex}`,
     emoji: "CR",
-    role: "Custom role owner",
-    vibe: "clear, adaptable, reliable",
-    mission: "Own the assigned work cleanly.",
+    role: "自定义角色负责人",
+    vibe: "清晰、灵活、可靠",
+    mission: "清楚地接住任务，并把它推进到可交付状态。",
     responsibilities: [
-      "Take the scoped task.",
-      "Move it forward with low noise.",
-      "Leave a usable closeout."
+      "接住已经明确范围的任务。",
+      "低噪音推进，不制造无效沟通。",
+      "留下可复用的总结或交接。"
     ],
     binding: ""
   };
@@ -167,7 +167,7 @@ function renderRoles() {
     for (const input of fragment.querySelectorAll("input, select, textarea")) {
       input.addEventListener("input", () => {
         syncRoleFromCard(role, card);
-        fragment.querySelector(".role-heading").textContent = role.name || role.id || "Unnamed role";
+        fragment.querySelector(".role-heading").textContent = role.name || role.id || "未命名角色";
         fragment.querySelector(".role-caption").textContent = roleSummary(role);
         applyModeState(card, role);
         refreshPreview();
@@ -175,7 +175,7 @@ function renderRoles() {
 
       input.addEventListener("change", () => {
         syncRoleFromCard(role, card);
-        fragment.querySelector(".role-heading").textContent = role.name || role.id || "Unnamed role";
+        fragment.querySelector(".role-heading").textContent = role.name || role.id || "未命名角色";
         fragment.querySelector(".role-caption").textContent = roleSummary(role);
         applyModeState(card, role);
         refreshPreview();
@@ -208,7 +208,7 @@ async function loadInitialState() {
   updateProjectFields();
   renderRoles();
   refreshPreview();
-  setStatus("Loaded current config.", "ok");
+  setStatus("已加载当前配置。", "ok");
 }
 
 elements.projectName.addEventListener("input", refreshPreview);
@@ -227,8 +227,8 @@ elements.resetDefaults.addEventListener("click", () => {
   updateProjectFields();
   renderRoles();
   refreshPreview();
-  elements.scriptPreview.textContent = "No script generated yet.";
-  setStatus("Reset to built-in defaults.", "ok");
+  elements.scriptPreview.textContent = "暂未生成脚本。";
+  setStatus("已重置为默认配置。", "ok");
 });
 
 elements.downloadConfig.addEventListener("click", () => {
@@ -238,7 +238,7 @@ elements.downloadConfig.addEventListener("click", () => {
 
 elements.downloadScript.addEventListener("click", () => {
   if (!state.generated || !state.generated.applyScript) {
-    setStatus("Generate assets first, then download the apply script.", "error");
+    setStatus("请先生成产物，再下载应用脚本。", "error");
     return;
   }
   downloadBlob(state.config.outputScriptName || "apply-opencrew-feishu.generated.ps1", state.generated.applyScript, "text/plain");
@@ -257,8 +257,8 @@ elements.importConfig.addEventListener("change", async (event) => {
     updateProjectFields();
     renderRoles();
     refreshPreview();
-    elements.scriptPreview.textContent = "Imported config. Generate assets to preview the apply script.";
-    setStatus(`Imported ${file.name}.`, "ok");
+    elements.scriptPreview.textContent = "配置已导入，点击“生成产物”后可预览应用脚本。";
+    setStatus(`已导入 ${file.name}。`, "ok");
   } catch (error) {
     setStatus(error.message, "error");
   } finally {
@@ -277,7 +277,7 @@ elements.saveConfig.addEventListener("click", async () => {
     updateProjectFields();
     renderRoles();
     refreshPreview();
-    setStatus(`Saved config to ${result.configPath}.`, "ok");
+    setStatus(`配置已保存到 ${result.configPath}。`, "ok");
   } catch (error) {
     setStatus(error.message, "error");
   }
@@ -296,7 +296,7 @@ elements.generateAssets.addEventListener("click", async () => {
     renderRoles();
     refreshPreview();
     elements.scriptPreview.textContent = result.applyScript;
-    setStatus(`Generated assets: ${result.applyScriptPath}`, "ok");
+    setStatus(`已生成产物：${result.applyScriptPath}`, "ok");
   } catch (error) {
     setStatus(error.message, "error");
   }

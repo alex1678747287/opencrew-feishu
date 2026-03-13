@@ -1,14 +1,13 @@
-# Checkpoint Template
+# 进度模板
 
-Use this when work is in progress and a visible update is needed.
+当任务在进行中且需要对外同步状态时使用。
 
 ```text
 TID: <tid>
-Checkpoint:
-- Status: on_track | blocked | scope_changed | waiting_approval
-- Completed: <what is done>
-- Next: <next step>
-- Risk: <main risk or none>
-- Need from human: <approval, input, or none>
+进度:
+- 状态: on_track | blocked | scope_changed | waiting_approval
+- 已完成: <已经做完的内容>
+- 下一步: <下一步动作>
+- 风险: <主要风险或 none>
+- 需要人工: <审批、输入或 none>
 ```
-

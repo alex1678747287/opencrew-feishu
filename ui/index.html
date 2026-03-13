@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>OpenCrew Feishu Control</title>
+    <title>OpenCrew 飞书控制台</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
@@ -11,19 +11,19 @@
       <section class="hero">
         <div class="hero-copy">
           <p class="eyebrow">OpenCrew x Feishu</p>
-          <h1>Role Control Studio</h1>
+          <h1>角色控制台</h1>
           <p class="lede">
-            Create roles, bind Feishu groups, and generate a portable OpenClaw split-agent package without editing raw config by hand.
+            通过页面创建角色、绑定飞书群 ID，并生成可迁移的 OpenClaw 多角色协作配置，无需手改原始配置文件。
           </p>
         </div>
         <div class="hero-meta">
           <div class="stat">
-            <span class="stat-label">Mode</span>
-            <strong>Split-Agent Ready</strong>
+            <span class="stat-label">模式</span>
+            <strong>已支持多角色拆分</strong>
           </div>
           <div class="stat">
-            <span class="stat-label">Output</span>
-            <strong>Config + Apply Script</strong>
+            <span class="stat-label">产物</span>
+            <strong>配置文件 + 应用脚本</strong>
           </div>
         </div>
       </section>
@@ -31,47 +31,47 @@
       <section class="panel panel-grid">
         <div class="stack">
           <div class="section-head">
-            <h2>Project</h2>
-            <p>Global settings for this local repo.</p>
+            <h2>项目</h2>
+            <p>当前本地仓库的全局设置。</p>
           </div>
           <label class="field">
-            <span>Project name</span>
+            <span>项目名称</span>
             <input id="projectName" type="text">
           </label>
           <label class="field">
-            <span>OpenClaw command</span>
+            <span>OpenClaw 命令</span>
             <input id="openclawCmd" type="text">
           </label>
           <label class="field">
-            <span>Generated script name</span>
+            <span>生成脚本名</span>
             <input id="outputScriptName" type="text">
           </label>
           <div class="actions">
-            <button id="resetDefaults" class="ghost">Reset defaults</button>
-            <button id="saveConfig" class="ghost">Save config</button>
-            <button id="generateAssets" class="primary">Generate assets</button>
+            <button id="resetDefaults" class="ghost">重置默认值</button>
+            <button id="saveConfig" class="ghost">保存配置</button>
+            <button id="generateAssets" class="primary">生成产物</button>
           </div>
           <div class="actions">
-            <button id="downloadConfig" class="ghost">Download config</button>
-            <button id="downloadScript" class="ghost">Download script</button>
+            <button id="downloadConfig" class="ghost">下载配置</button>
+            <button id="downloadScript" class="ghost">下载脚本</button>
             <label class="ghost file-button">
               <input id="importConfig" type="file" accept=".json">
-              Import config
+              导入配置
             </label>
           </div>
-          <div id="statusBar" class="status">Loading current config...</div>
+          <div id="statusBar" class="status">正在加载当前配置...</div>
         </div>
 
         <div class="stack notes-card">
           <div class="section-head">
-            <h2>Notes</h2>
-            <p>How this UI maps to the repo.</p>
+            <h2>说明</h2>
+            <p>这个页面和仓库文件的对应关系。</p>
           </div>
           <ul class="plain-list">
-            <li>Built-in roles reuse the scaffold under <code>scaffold/</code>.</li>
-            <li>Custom roles are generated under <code>roles/&lt;id&gt;/</code>.</li>
-            <li>Feishu group IDs should be entered without the <code>feishu:</code> prefix.</li>
-            <li>The generated apply script is portable and resolves paths relative to this repo.</li>
+            <li>内置角色会复用 <code>scaffold/</code> 下的模板。</li>
+            <li>自定义角色会生成到 <code>roles/&lt;id&gt;/</code>。</li>
+            <li>飞书群 ID 直接填写原始值，不要加 <code>feishu:</code> 前缀。</li>
+            <li>生成的应用脚本使用相对路径，方便整个仓库迁移到其他电脑。</li>
           </ul>
         </div>
       </section>
@@ -79,10 +79,10 @@
       <section class="panel">
         <div class="section-head section-head-row">
           <div>
-            <h2>Roles</h2>
-            <p>Use built-in OpenCrew roles or create your own generated role workspaces.</p>
+            <h2>角色</h2>
+            <p>可以直接使用 OpenCrew 内置角色，也可以创建你自己的角色工作区。</p>
           </div>
-          <button id="addRole" class="primary subtle">Add custom role</button>
+          <button id="addRole" class="primary subtle">新增自定义角色</button>
         </div>
         <div id="roleList" class="role-list"></div>
       </section>
@@ -90,17 +90,17 @@
       <section class="panel panel-grid previews">
         <div class="stack">
           <div class="section-head">
-            <h2>Config preview</h2>
-            <p>The exact JSON that will be saved and reused on other machines.</p>
+            <h2>配置预览</h2>
+            <p>这里展示会被保存并可在其他电脑复用的完整 JSON。</p>
           </div>
           <pre id="configPreview" class="code-block"></pre>
         </div>
         <div class="stack">
           <div class="section-head">
-            <h2>Generated apply script</h2>
-            <p>Created after you click Generate assets.</p>
+            <h2>生成的应用脚本</h2>
+            <p>点击“生成产物”后会在这里显示。</p>
           </div>
-          <pre id="scriptPreview" class="code-block muted">No script generated yet.</pre>
+          <pre id="scriptPreview" class="code-block muted">暂未生成脚本。</pre>
         </div>
       </section>
     </main>
@@ -115,33 +115,33 @@
               <p class="role-caption"></p>
             </div>
           </div>
-          <button class="danger remove-role" type="button">Remove</button>
+          <button class="danger remove-role" type="button">删除</button>
         </div>
 
         <div class="role-grid">
           <label class="field">
-            <span>Mode</span>
+            <span>模式</span>
             <select class="role-mode">
-              <option value="builtin">Built-in</option>
-              <option value="custom">Custom</option>
+              <option value="builtin">内置</option>
+              <option value="custom">自定义</option>
             </select>
           </label>
           <label class="field">
-            <span>Preset</span>
+            <span>预设</span>
             <select class="role-preset">
-              <option value="cos">CoS</option>
-              <option value="cto">CTO</option>
-              <option value="builder">Builder</option>
-              <option value="ko">KO</option>
-              <option value="ops">Ops</option>
+              <option value="cos">CoS 幕僚长</option>
+              <option value="cto">CTO 技术统筹</option>
+              <option value="builder">Builder 执行者</option>
+              <option value="ko">KO 知识官</option>
+              <option value="ops">Ops 运维审查</option>
             </select>
           </label>
           <label class="field">
-            <span>Role ID</span>
+            <span>角色 ID</span>
             <input class="role-id" type="text">
           </label>
           <label class="field">
-            <span>Display name</span>
+            <span>显示名称</span>
             <input class="role-name" type="text">
           </label>
           <label class="field">
@@ -149,24 +149,24 @@
             <input class="role-emoji" type="text">
           </label>
           <label class="field">
-            <span>Feishu group ID</span>
+            <span>飞书群 ID</span>
             <input class="role-binding" type="text" placeholder="oc_xxx">
           </label>
           <label class="field field-span-2">
-            <span>Role title</span>
+            <span>角色标题</span>
             <input class="role-title-input" type="text">
           </label>
           <label class="field field-span-2">
-            <span>Vibe</span>
+            <span>风格</span>
             <input class="role-vibe" type="text">
           </label>
           <label class="field field-span-2">
-            <span>Mission</span>
+            <span>使命</span>
             <textarea class="role-mission" rows="2"></textarea>
           </label>
           <label class="field field-span-2">
-            <span>Responsibilities</span>
-            <textarea class="role-responsibilities" rows="4" placeholder="One line per responsibility"></textarea>
+            <span>职责</span>
+            <textarea class="role-responsibilities" rows="4" placeholder="每行一条职责"></textarea>
           </label>
         </div>
       </article>

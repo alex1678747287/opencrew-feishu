@@ -1,26 +1,25 @@
-# Ops Review Protocol
+# 运维审查协议
 
-Run this review when the task is risky enough to justify an `Ops` pass.
+当任务风险足够高，需要 `Ops` 介入时使用此审查。
 
-## Review Points
+## 审查点
 
-1. Scope
-   Is the change bounded and explained?
-2. Rollback
-   Can the change be reverted safely?
-3. Data and Secrets
-   Does the work expose, move, or depend on sensitive data?
-4. User Impact
-   Could the change affect live users or shared channels?
-5. Operability
-   Is there enough evidence to know whether it worked?
+1. 范围
+   变更是否有边界，是否说明清楚？
+2. 回滚
+   变更是否可以安全回退？
+3. 数据与密钥
+   是否暴露、移动或依赖敏感数据？
+4. 用户影响
+   是否会影响真实用户或共享渠道？
+5. 可运维性
+   是否有足够证据判断是否成功？
 
-## Output Shape
+## 输出格式
 
 ```text
-Ops Review:
-- Verdict: pass | pass_with_caution | hold
-- Main concern: <one line>
-- Needed mitigation: <one line or none>
+运维审查:
+- 结论: pass | pass_with_caution | hold
+- 主要关注点: <一句话>
+- 需要补救: <一句话或 none>
 ```
-

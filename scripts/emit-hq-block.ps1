@@ -28,44 +28,44 @@ switch ($Mode) {
         if (-not $Tid) { throw 'Tid is required for checkpoint mode.' }
         @(
             "TID: $Tid",
-            'Checkpoint:',
-            "- Status: $Status",
-            "- Completed: $Completed",
-            "- Next: $Next",
-            "- Risk: $Risk",
-            "- Need from human: $NeedFromHuman"
+            '进度:',
+            "- 状态: $Status",
+            "- 已完成: $Completed",
+            "- 下一步: $Next",
+            "- 风险: $Risk",
+            "- 需要人工: $NeedFromHuman"
         ) -join [Environment]::NewLine
     }
     'closeout' {
         if (-not $Tid) { throw 'Tid is required for closeout mode.' }
         @(
             "TID: $Tid",
-            'Closeout:',
-            "- Outcome: $Outcome",
-            "- What changed: $Changed",
-            "- Evidence: $Evidence",
-            "- Risk: $Risk",
-            "- Next: $Next"
+            '结项:',
+            "- 结果: $Outcome",
+            "- 变更内容: $Changed",
+            "- 证据: $Evidence",
+            "- 剩余风险: $Risk",
+            "- 下一步: $Next"
         ) -join [Environment]::NewLine
     }
     'handoff' {
         if (-not $Tid) { throw 'Tid is required for handoff mode.' }
         @(
-            'Handoff:',
-            "- From: $From",
-            "- To: $To",
+            '交接:',
+            "- 来自: $From",
+            "- 交给: $To",
             "- TID: $Tid",
-            "- Ask: $Ask",
-            "- Constraints: $Constraints",
-            "- Done when: $DoneWhen"
+            "- 请求: $Ask",
+            "- 约束: $Constraints",
+            "- 完成标准: $DoneWhen"
         ) -join [Environment]::NewLine
     }
     'ops-review' {
         @(
-            'Ops Review:',
-            "- Verdict: $Verdict",
-            "- Main concern: $MainConcern",
-            "- Needed mitigation: $NeededMitigation"
+            '运维审查:',
+            "- 结论: $Verdict",
+            "- 主要关注点: $MainConcern",
+            "- 需要补救: $NeededMitigation"
         ) -join [Environment]::NewLine
     }
 }

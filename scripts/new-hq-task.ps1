@@ -3,7 +3,7 @@ param(
     [string]$Type = 'A',
     [Parameter(Mandatory = $true)]
     [string]$Goal,
-    [string]$Acceptance = 'Define a concrete done state',
+    [string]$Acceptance = '定义明确的完成标准',
     [string]$Owner = 'HQ(CoS)',
     [ValidateSet('triage', 'active', 'blocked', 'waiting_approval', 'done', 'cancelled')]
     [string]$State = 'triage',
@@ -52,28 +52,28 @@ $content = @(
     "# $tid",
     '',
     "TID: $tid",
-    "Type: $Type",
-    "Owner: $Owner",
-    "Goal: $Goal",
-    "Acceptance: $Acceptance",
-    "State: $State",
+    "类型: $Type",
+    "负责人: $Owner",
+    "目标: $Goal",
+    "验收: $Acceptance",
+    "状态: $State",
     "CreatedAt: $createdAt",
     '',
-    '## Context',
+    '## 背景',
     '',
     '- ',
     '',
-    '## Plan',
+    '## 计划',
     '',
     '- ',
     '',
-    '## Latest Checkpoint',
+    '## 最新进度',
     '',
-    '_none yet_',
+    '_暂无_',
     '',
-    '## Closeout',
+    '## 结项',
     '',
-    '_open_'
+    '_待填写_'
 )
 
 Set-Content -LiteralPath $filePath -Value $content -Encoding UTF8
@@ -93,4 +93,3 @@ if ($Json) {
 } else {
     $result
 }
-

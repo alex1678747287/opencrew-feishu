@@ -1,43 +1,42 @@
-# Example HQ Task
+# HQ 任务示例
 
 TID: TID-20260313-1600-feishu-opencrew
-Type: A
-Owner: HQ(CoS/Builder)
-Goal: Prepare the minimal Feishu adaptation scaffold
-Acceptance: Files exist, helper scripts validate, and live routing remains untouched
-State: done
+类型: A
+负责人: HQ(CoS/Builder)
+目标: 准备最小可用的飞书适配 scaffold
+验收: 文件存在、辅助脚本验证通过、现网路由未被触碰
+状态: done
 CreatedAt: 2026-03-13T16:00:00+08:00
 
-## Context
+## 背景
 
-- starting from a single-agent local OpenClaw setup
-- Feishu channel already configured
-- no dedicated role group IDs yet
+- 当前基线是单 agent 的本地 OpenClaw
+- 飞书通道已经配置好
+- 还没有专属角色群 ID
 
-## Plan
+## 计划
 
-- add shared protocol files
-- add role workspace templates
-- add a future binding generator
-- patch the main workspace to read the HQ protocol in shared Feishu contexts
+- 添加共享协议文件
+- 添加角色工作区模板
+- 添加后续绑定生成器
+- 让主工作区在共享飞书场景读取 HQ 协议
 
-## Latest Checkpoint
-
-TID: TID-20260313-1600-feishu-opencrew
-Checkpoint:
-- Status: on_track
-- Completed: Shared protocol files and role templates created
-- Next: Add helper scripts and run a dry-run verification
-- Risk: PowerShell execution policy may block direct script invocation
-- Need from human: none
-
-## Closeout
+## 最新进度
 
 TID: TID-20260313-1600-feishu-opencrew
-Closeout:
-- Outcome: done
-- What changed: Scaffold created, generator added, HQ protocol linked from the main workspace
-- Evidence: Script syntax parse passed and generator dry-run produced an apply script
-- Risk: Real split-agent binding still needs actual Feishu role group IDs
-- Next: Bind `CoS`, `CTO`, and `Builder` once those IDs are known
+进度:
+- 状态: on_track
+- 已完成: 共享协议文件和角色模板已创建
+- 下一步: 增加辅助脚本并完成一次干运行验证
+- 风险: PowerShell 执行策略可能阻止脚本直接运行
+- 需要人工: none
 
+## 结项
+
+TID: TID-20260313-1600-feishu-opencrew
+结项:
+- 结果: done
+- 变更内容: scaffold 已创建、生成器已加入、主工作区已接入 HQ 协议
+- 证据: 脚本语法解析通过，生成器干运行产出了应用脚本
+- 剩余风险: 真正的多角色绑定仍然需要实际飞书角色群 ID
+- 下一步: 当群 ID 明确后，绑定 `CoS`、`CTO` 和 `Builder`

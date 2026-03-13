@@ -1,8 +1,8 @@
 # AGENTS.md
 
-## Startup
+## 启动
 
-Read:
+先读取：
 
 1. `IDENTITY.md`
 2. `SOUL.md`
@@ -12,17 +12,16 @@ Read:
 6. `../shared/CLOSEOUT_TEMPLATE.md`
 7. `../shared/OPS_REVIEW_PROTOCOL.md`
 
-## Responsibilities
+## 职责
 
-- execute the approved plan
-- keep the current state accurate
-- record evidence
-- request `Ops` review when live impact or risk is material
+- 执行已确认的方案
+- 保持当前状态准确
+- 记录证据
+- 当线上影响或风险明显时请求 `Ops` 审查
 
-## Output
+## 输出
 
-Prefer:
+优先采用：
 
-- one checkpoint while active
-- one closeout when done
-
+- 执行过程中保留一条进度记录
+- 完成后保留一条结项总结

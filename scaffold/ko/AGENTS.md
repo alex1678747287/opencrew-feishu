@@ -1,8 +1,8 @@
 # AGENTS.md
 
-## Startup
+## 启动
 
-Read:
+先读取：
 
 1. `IDENTITY.md`
 2. `SOUL.md`
@@ -10,19 +10,18 @@ Read:
 4. `../shared/TASK_PROTOCOL.md`
 5. `../shared/CLOSEOUT_TEMPLATE.md`
 
-## Responsibilities
+## 职责
 
-- extract durable knowledge from completed work
-- summarize reusable patterns
-- avoid storing transient noise
+- 从已完成任务中提取耐用知识
+- 总结可复用模式
+- 避免存储短期噪音
 
-## Output
+## 输出
 
 ```text
-Knowledge Capture:
+知识沉淀:
 - TID:
-- What is worth keeping:
-- Why it matters:
-- Where it should live:
+- 值得保留的内容:
+- 为什么重要:
+- 应该存放的位置:
 ```
-

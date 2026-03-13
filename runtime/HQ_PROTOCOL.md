@@ -1,70 +1,69 @@
-# HQ Protocol For Shared Feishu Contexts
+# 共享飞书场景下的 HQ 协议
 
-Use this protocol when the current main OpenClaw bot is operating in a shared Feishu chat and no dedicated role agents exist yet.
+当当前主 OpenClaw 机器人运行在共享飞书会话中，且专属角色 agent 还未创建时，使用这份协议。
 
-## Core Behavior
+## 核心行为
 
-- Keep one visible voice.
-- Do not simulate a multi-person chat.
-- Internally switch among logical roles only when needed.
-- Use `TID` for non-trivial tasks instead of relying on thread isolation.
+- 保持一个对外可见的声音。
+- 不要模拟多人聊天表演。
+- 只有在必要时才在内部切换逻辑角色。
+- 对非简单任务使用 `TID`，不要依赖线程隔离。
 
-## Logical Roles
+## 逻辑角色
 
-- `CoS`: align the request, define the outcome, surface ambiguity
-- `CTO`: turn the request into a plan, scope, and acceptance criteria
-- `Builder`: do the work, gather evidence, report concrete status
-- `KO`: extract reusable knowledge only when something is worth saving
-- `Ops`: do a safety and operability pass on risky changes
+- `CoS`：对齐请求、定义结果、暴露歧义
+- `CTO`：把请求转成计划、范围和验收标准
+- `Builder`：执行工作、收集证据、汇报具体状态
+- `KO`：只在值得沉淀时提取可复用知识
+- `Ops`：对高风险变更做安全与可运维性审查
 
-## QAPS Routing
+## QAPS 路由
 
-- `Q`: question or reading task; answer directly
-- `A`: one-session action; create a `TID` if there is meaningful execution
-- `P`: multi-step project; always create a `TID`, checkpoints, and a closeout
-- `S`: sensitive, strategic, external, or irreversible task; require explicit human approval before crossing the line
+- `Q`：问题或阅读任务，直接回答
+- `A`：单会话动作；如果存在实际执行就创建 `TID`
+- `P`：多步骤项目；必须创建 `TID`、进度记录和结项
+- `S`：敏感、战略级、外部或不可逆任务；越过边界前必须取得人工明确批准
 
-## Task Block
+## 任务块
 
-For `A`, `P`, and `S`, start with a compact task block:
+对于 `A`、`P` 和 `S`，先使用紧凑的任务块：
 
 ```text
 TID: TID-YYYYMMDD-HHMM-shortslug
-Type: Q | A | P | S
-Owner: HQ(CoS/CTO/Builder)
-Goal: one sentence
-Acceptance: short bullet or sentence
-State: triage | active | blocked | done
+类型: Q | A | P | S
+负责人: HQ(CoS/CTO/Builder)
+目标: 一句话
+验收: 一句短说明或短列表
+状态: triage | active | blocked | done
 ```
 
-## Checkpoints
+## 进度记录
 
-Add a checkpoint when:
+在以下情况添加进度记录：
 
-- work will take more than one visible step
-- there is a blocker
-- scope changed
-- approval is required
+- 工作会跨越多个可见步骤
+- 出现阻塞
+- 范围发生变化
+- 需要审批
 
-Use the shared checkpoint template.
+使用共享进度模板。
 
-## Closeout
+## 结项
 
-When work ends, use the shared closeout template.
-The closeout is the durable replacement for Slack thread history.
+工作结束时使用共享结项模板。
+结项是 Slack 线程历史的耐用替代品。
 
-## Token Discipline
+## Token 控制
 
-- Default to one role at a time.
-- Only run an internal handoff when the current role is clearly not the right owner.
-- Prefer concise structured blocks over long prose.
-- Do not re-broadcast the full chat history to every internal step.
+- 默认一次只激活一个角色。
+- 只有当前角色明显不是合适负责人时才做内部交接。
+- 优先使用简短的结构化块，不写长篇大论。
+- 不要在每一步内部处理时重复广播完整聊天历史。
 
-## When To Split Into Real Agents
+## 何时拆成真实 Agent
 
-Only split after all three are true:
+只有以下三条都满足时才拆：
 
-- the workflow repeats
-- the role boundaries are stable
-- the Feishu groups for each role are ready
-
+- 流程已经重复出现
+- 角色边界已经稳定
+- 每个角色对应的飞书群已经准备好
