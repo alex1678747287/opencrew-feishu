@@ -107,10 +107,10 @@ function renderCustomIdentity(role) {
   return [
     "# IDENTITY.md",
     "",
-    `- 显示名称: ${role.name}`,
+    `- 名称: ${role.name}`,
     `- 角色定位: ${role.role}`,
     `- 工作风格: ${role.vibe}`,
-    `- 角色代号: ${role.emoji}`
+    `- 标识: ${role.emoji}`
   ].join("\n");
 }
 
@@ -150,7 +150,11 @@ function renderCustomAgents(role) {
     "",
     "## 协作要求",
     "",
-    "在协作过程中，先确认输入与边界，再按协议推进。出现阻塞、依赖或风险时，需要及时上报并给出下一步建议。"
+    "在协作过程中，先确认输入与边界，再按协议推进。出现阻塞、依赖或风险时，需要及时上报并给出下一步建议。",
+    "",
+    "## 输出要求",
+    "",
+    `- 每次对外回复第一行以 \`【${role.name}】\` 开头。`
   ].join("\n");
 }
 
