@@ -3,170 +3,246 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>OpenCrew 飞书控制台</title>
+    <title>OpenCrew Feishu 控制台</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <main class="shell">
-      <section class="hero">
+    <main class="page">
+      <section class="panel hero">
         <div class="hero-copy">
-          <p class="eyebrow">OpenCrew x Feishu</p>
-          <h1>角色控制台</h1>
+          <p class="eyebrow">OpenCrew x 飞书</p>
+          <h1>角色协作控制台</h1>
           <p class="lede">
-            通过页面创建角色、绑定飞书群 ID，并生成可迁移的 OpenClaw 多角色协作配置，无需手改原始配置文件。
+            先在这里配置角色、飞书群 ID 和生成脚本，再按需同步到 OpenClaw。
+            保存配置不会直接改动现有 agent，只有执行生成脚本时才会落地。
           </p>
         </div>
-        <div class="hero-meta">
-          <div class="stat">
-            <span class="stat-label">模式</span>
-            <strong>已支持多角色拆分</strong>
-          </div>
-          <div class="stat">
-            <span class="stat-label">产物</span>
-            <strong>配置文件 + 应用脚本</strong>
-          </div>
+
+        <div class="hero-steps">
+          <article class="step-card">
+            <span class="step-index">1</span>
+            <div>
+              <strong>先配项目</strong>
+              <p>确认项目名、OpenClaw 命令路径，以及最终输出脚本名。</p>
+            </div>
+          </article>
+          <article class="step-card">
+            <span class="step-index">2</span>
+            <div>
+              <strong>再配角色</strong>
+              <p>启用需要落地的角色，为每个角色填写飞书群 ID。新增角色默认按自定义角色处理。</p>
+            </div>
+          </article>
+          <article class="step-card">
+            <span class="step-index">3</span>
+            <div>
+              <strong>最后生成</strong>
+              <p>生成脚本与工作区后，再去执行脚本，把配置同步到 OpenClaw。</p>
+            </div>
+          </article>
         </div>
       </section>
 
-      <section class="panel panel-grid">
-        <div class="stack">
-          <div class="section-head">
-            <h2>项目</h2>
-            <p>当前本地仓库的全局设置。</p>
+      <section class="workspace">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>项目设置</h2>
+              <p>这里保存的是控制台配置，不会直接创建角色。</p>
+            </div>
+            <div class="badge-row">
+              <span class="badge">本地配置</span>
+              <span class="badge">飞书绑定</span>
+            </div>
           </div>
-          <label class="field">
-            <span>项目名称</span>
-            <input id="projectName" type="text">
-          </label>
-          <label class="field">
-            <span>OpenClaw 命令</span>
-            <input id="openclawCmd" type="text">
-          </label>
-          <label class="field">
-            <span>生成脚本名</span>
-            <input id="outputScriptName" type="text">
-          </label>
-          <div class="actions">
-            <button id="resetDefaults" class="ghost">重置默认值</button>
-            <button id="saveConfig" class="ghost">保存配置</button>
-            <button id="generateAssets" class="primary">生成产物</button>
+
+          <div class="field-grid">
+            <label class="field field-span-2">
+              <span>项目名称</span>
+              <input id="projectName" type="text" placeholder="opencrew-feishu">
+            </label>
+            <label class="field field-span-2">
+              <span>OpenClaw 命令</span>
+              <input id="openclawCmd" type="text" placeholder="C:\Program Files\nodejs\openclaw.cmd">
+            </label>
+            <label class="field field-span-2">
+              <span>输出脚本名</span>
+              <input id="outputScriptName" type="text" placeholder="apply-opencrew-feishu.generated.ps1">
+            </label>
           </div>
-          <div class="actions">
-            <button id="downloadConfig" class="ghost">下载配置</button>
-            <button id="downloadScript" class="ghost">下载脚本</button>
+
+          <div class="action-bar">
+            <button id="saveConfig" class="ghost" type="button">保存配置</button>
+            <button id="resetDefaults" class="ghost" type="button">恢复默认模板</button>
+            <button id="generateAssets" class="primary" type="button">生成脚本与工作区</button>
+          </div>
+
+          <div class="action-bar">
+            <button id="downloadConfig" class="ghost" type="button">导出配置 JSON</button>
+            <button id="downloadScript" class="ghost" type="button">下载生成脚本</button>
             <label class="ghost file-button">
               <input id="importConfig" type="file" accept=".json">
               导入配置
             </label>
           </div>
-          <div id="statusBar" class="status">正在加载当前配置...</div>
-        </div>
 
-        <div class="stack notes-card">
-          <div class="section-head">
-            <h2>说明</h2>
-            <p>这个页面和仓库文件的对应关系。</p>
+          <div id="statusBar" class="status">正在加载配置...</div>
+        </article>
+
+        <aside class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>当前概览</h2>
+              <p>先用模板起步，再把真正需要的业务角色扩展成自定义角色。</p>
+            </div>
           </div>
+
+          <div class="summary-stats">
+            <article class="summary-card">
+              <span class="summary-label">角色总数</span>
+              <strong id="roleCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">已启用</span>
+              <strong id="enabledCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">已填群 ID</span>
+              <strong id="boundCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">自定义角色</span>
+              <strong id="customCount">0</strong>
+            </article>
+          </div>
+
           <ul class="plain-list">
-            <li>内置角色会复用 <code>scaffold/</code> 下的模板。</li>
-            <li>自定义角色会生成到 <code>roles/&lt;id&gt;/</code>。</li>
-            <li>飞书群 ID 直接填写原始值，不要加 <code>feishu:</code> 前缀。</li>
-            <li>生成的应用脚本使用相对路径，方便整个仓库迁移到其他电脑。</li>
+            <li>预置模板用于保留 OpenCrew 的协作骨架，自定义角色用于承接你的业务边界。</li>
+            <li>飞书绑定只需要填写群 ID，系统生成脚本时会自动补上 <code>feishu:</code>。</li>
+            <li>预置模板内容默认锁定；如果你要改职责边界，切换为“自定义角色”即可。</li>
+            <li>新增或复制出来的自定义角色默认不启用，避免误绑定到错误群。</li>
           </ul>
-        </div>
+        </aside>
       </section>
 
       <section class="panel">
-        <div class="section-head section-head-row">
+        <div class="panel-head">
           <div>
-            <h2>角色</h2>
-            <p>可以直接使用 OpenCrew 内置角色，也可以创建你自己的角色工作区。</p>
+            <h2>角色配置</h2>
+            <p>这里决定哪些角色会真正生成工作区并绑定到飞书。</p>
           </div>
-          <button id="addRole" class="primary subtle">新增自定义角色</button>
+          <button id="addRole" class="primary" type="button">新增自定义角色</button>
         </div>
         <div id="roleList" class="role-list"></div>
       </section>
 
-      <section class="panel panel-grid previews">
-        <div class="stack">
-          <div class="section-head">
-            <h2>配置预览</h2>
-            <p>这里展示会被保存并可在其他电脑复用的完整 JSON。</p>
+      <section class="preview-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>配置预览</h2>
+              <p>保存前可以先确认 JSON 结构是否符合你的预期。</p>
+            </div>
           </div>
           <pre id="configPreview" class="code-block"></pre>
-        </div>
-        <div class="stack">
-          <div class="section-head">
-            <h2>生成的应用脚本</h2>
-            <p>点击“生成产物”后会在这里显示。</p>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>脚本预览</h2>
+              <p>生成后这里会显示 apply 脚本，你可以先检查再执行。</p>
+            </div>
           </div>
-          <pre id="scriptPreview" class="code-block muted">暂未生成脚本。</pre>
-        </div>
+          <pre id="scriptPreview" class="code-block muted">生成后这里会显示 apply 脚本预览。</pre>
+        </article>
       </section>
     </main>
 
     <template id="roleTemplate">
       <article class="role-card">
-        <div class="role-top">
-          <div class="role-title">
-            <input class="role-enabled" type="checkbox">
+        <div class="role-card-head">
+          <div class="role-card-title">
             <div>
               <h3 class="role-heading"></h3>
               <p class="role-caption"></p>
             </div>
           </div>
-          <button class="danger remove-role" type="button">删除</button>
+          <div class="role-card-actions">
+            <label class="toggle">
+              <input class="role-enabled" type="checkbox">
+              <span>启用</span>
+            </label>
+            <span class="role-chip role-kind"></span>
+            <button class="ghost duplicate-role" type="button">复制为自定义</button>
+            <button class="danger remove-role" type="button">删除</button>
+          </div>
         </div>
 
-        <div class="role-grid">
+        <div class="notice builtin-notice">
+          当前是预置模板。要改角色边界，请切换成“自定义角色”或直接复制一份。
+        </div>
+
+        <div class="field-grid">
           <label class="field">
-            <span>模式</span>
+            <span>角色模式</span>
             <select class="role-mode">
-              <option value="builtin">内置</option>
-              <option value="custom">自定义</option>
+              <option value="builtin">预置模板</option>
+              <option value="custom">自定义角色</option>
             </select>
           </label>
+
           <label class="field">
-            <span>预设</span>
+            <span>预置模板</span>
             <select class="role-preset">
-              <option value="cos">CoS 幕僚长</option>
-              <option value="cto">CTO 技术统筹</option>
-              <option value="builder">Builder 执行者</option>
-              <option value="ko">KO 知识官</option>
-              <option value="ops">Ops 运维审查</option>
+              <option value="cos">协作指挥官</option>
+              <option value="cto">技术负责人</option>
+              <option value="builder">执行构建师</option>
+              <option value="ko">知识运营</option>
+              <option value="ops">流程运营</option>
             </select>
           </label>
+
           <label class="field">
             <span>角色 ID</span>
-            <input class="role-id" type="text">
+            <input class="role-id" type="text" placeholder="建议使用英文字母、数字和短横线">
           </label>
+
           <label class="field">
             <span>显示名称</span>
-            <input class="role-name" type="text">
+            <input class="role-name" type="text" placeholder="例如：财务机器人">
           </label>
-          <label class="field">
-            <span>Emoji</span>
-            <input class="role-emoji" type="text">
-          </label>
-          <label class="field">
+
+          <label class="field field-span-2">
             <span>飞书群 ID</span>
-            <input class="role-binding" type="text" placeholder="oc_xxx">
+            <input class="role-binding" type="text" placeholder="只填群 ID，不要带 feishu:">
+            <small>只有启用的角色才要求填写飞书群 ID。</small>
           </label>
+
+          <label class="field">
+            <span>角色代号</span>
+            <input class="role-emoji" type="text" placeholder="例如：FIN">
+          </label>
+
+          <label class="field">
+            <span>角色定位</span>
+            <input class="role-title-input" type="text" placeholder="例如：财务结算与对账负责人">
+          </label>
+
           <label class="field field-span-2">
-            <span>角色标题</span>
-            <input class="role-title-input" type="text">
+            <span>工作风格</span>
+            <input class="role-vibe" type="text" placeholder="例如：重视准确率、口径一致、留痕清晰">
           </label>
-          <label class="field field-span-2">
-            <span>风格</span>
-            <input class="role-vibe" type="text">
-          </label>
+
           <label class="field field-span-2">
             <span>使命</span>
-            <textarea class="role-mission" rows="2"></textarea>
+            <textarea class="role-mission" rows="3" placeholder="这个角色需要对什么结果负责"></textarea>
           </label>
+
           <label class="field field-span-2">
-            <span>职责</span>
-            <textarea class="role-responsibilities" rows="4" placeholder="每行一条职责"></textarea>
+            <span>职责清单</span>
+            <textarea class="role-responsibilities" rows="5" placeholder="每行一条职责"></textarea>
+            <small>生成工作区时，这里的内容会写入角色的说明文件。</small>
           </label>
         </div>
       </article>

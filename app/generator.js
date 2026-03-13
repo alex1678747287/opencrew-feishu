@@ -35,20 +35,21 @@ function normalizeBinding(input) {
   return String(input || "").replace(/^feishu:/i, "").trim();
 }
 
-function normalizeRole(rawRole, index) {
+function normalizeRole(rawRole = {}, index) {
   const mode = rawRole.mode === "custom" ? "custom" : "builtin";
   const rawId = rawRole.id || rawRole.name || `role-${index + 1}`;
   const id = slugify(rawId, `role-${index + 1}`);
-  const fallbackPreset = BUILTIN_ROLE_PRESETS[id] ? id : "cos";
+  const presetFromId = BUILTIN_ROLE_PRESETS[id] ? id : "cos";
   const preset = mode === "builtin"
-    ? (BUILTIN_ROLE_PRESETS[rawRole.preset] ? rawRole.preset : fallbackPreset)
+    ? (BUILTIN_ROLE_PRESETS[rawRole.preset] ? rawRole.preset : presetFromId)
     : null;
   const base = mode === "builtin" ? BUILTIN_ROLE_PRESETS[preset] : {};
+
   const name = String(rawRole.name || base.name || id).trim();
   const emoji = String(rawRole.emoji || base.emoji || id.slice(0, 2).toUpperCase()).trim();
-  const role = String(rawRole.role || base.role || "Role owner").trim();
-  const vibe = String(rawRole.vibe || base.vibe || "clear, reliable, focused").trim();
-  const mission = String(rawRole.mission || base.mission || "Own the assigned work.").trim();
+  const role = String(rawRole.role || base.role || "待定义角色").trim();
+  const vibe = String(rawRole.vibe || base.vibe || "清晰、可靠、专注交付。").trim();
+  const mission = String(rawRole.mission || base.mission || "对分配目标负责，并交付结果。").trim();
   const responsibilities = normalizeResponsibilities(
     rawRole.responsibilities || base.responsibilities || []
   );
@@ -68,31 +69,27 @@ function normalizeRole(rawRole, index) {
   };
 }
 
-function normalizeConfig(rawConfig) {
+function normalizeConfig(rawConfig = {}) {
   const base = createDefaultConfig();
-  const requestedScriptName = String(rawConfig.outputScriptName || base.outputScriptName).trim() || base.outputScriptName;
+  const requestedScriptName = String(rawConfig.outputScriptName || base.outputScriptName).trim()
+    || base.outputScriptName;
   const outputScriptName = requestedScriptName.toLowerCase().endsWith(".ps1")
     ? requestedScriptName
     : `${requestedScriptName}.ps1`;
+  const sourceRoles = Array.isArray(rawConfig.roles) ? rawConfig.roles : base.roles;
   const config = {
     projectName: String(rawConfig.projectName || base.projectName).trim() || base.projectName,
     openclawCmd: String(rawConfig.openclawCmd || base.openclawCmd).trim() || base.openclawCmd,
     outputScriptName,
-    roles: Array.isArray(rawConfig.roles) && rawConfig.roles.length > 0
-      ? rawConfig.roles.map((role, index) => normalizeRole(role, index))
-      : base.roles.map((role, index) => normalizeRole(role, index))
+    roles: sourceRoles.map((role, index) => normalizeRole(role, index))
   };
 
   const seen = new Set();
   for (const role of config.roles) {
     if (seen.has(role.id)) {
-      throw new Error(`Duplicate role id: ${role.id}`);
+      throw new Error(`角色 ID 重复：${role.id}`);
     }
     seen.add(role.id);
-  }
-
-  if (!config.roles.some((role) => role.enabled)) {
-    throw new Error("At least one role must be enabled.");
   }
 
   return config;
@@ -110,10 +107,10 @@ function renderCustomIdentity(role) {
   return [
     "# IDENTITY.md",
     "",
-    `- 名称: ${role.name}`,
-    `- 角色: ${role.role}`,
-    `- 风格: ${role.vibe}`,
-    `- 标识: ${role.emoji}`
+    `- 显示名称: ${role.name}`,
+    `- 角色定位: ${role.role}`,
+    `- 工作风格: ${role.vibe}`,
+    `- 角色代号: ${role.emoji}`
   ].join("\n");
 }
 
@@ -123,7 +120,7 @@ function renderCustomSoul(role) {
     "",
     role.mission,
     "",
-    "## 工作方式",
+    "## 职责清单",
     "",
     ...role.responsibilities.map((item) => `- ${item}`)
   ].join("\n");
@@ -133,14 +130,12 @@ function renderCustomAgents(role) {
   const sharedBase = "../../scaffold/shared";
   const responsibilityLines = role.responsibilities.length > 0
     ? role.responsibilities.map((item) => `- ${item}`)
-    : ["- Own the assigned work cleanly."];
+    : ["- 围绕分配任务稳定交付结果。"];
 
   return [
     "# AGENTS.md",
     "",
-    "## 启动",
-    "",
-    "先读取：",
+    "## 阅读顺序",
     "",
     "1. `IDENTITY.md`",
     "2. `SOUL.md`",
@@ -149,13 +144,13 @@ function renderCustomAgents(role) {
     `5. \`${sharedBase}/CHECKPOINT_TEMPLATE.md\``,
     `6. \`${sharedBase}/CLOSEOUT_TEMPLATE.md\``,
     "",
-    "## 职责",
+    "## 当前角色职责",
     "",
     ...responsibilityLines,
     "",
-    "## 飞书模式",
+    "## 协作要求",
     "",
-    "遇到非简单任务时使用 `TID`，保持上下文紧凑，并在任务重要时留下进度记录或结项总结。"
+    "在协作过程中，先确认输入与边界，再按协议推进。出现阻塞、依赖或风险时，需要及时上报并给出下一步建议。"
   ].join("\n");
 }
 
@@ -175,6 +170,7 @@ function resolveRoleWorkspace(projectRoot, role) {
   if (role.mode === "builtin") {
     return `scaffold/${role.preset}`;
   }
+
   return materializeCustomRole(projectRoot, role);
 }
 
@@ -197,17 +193,13 @@ function renderApplyScript(config, resolvedRoles) {
     lines.push(`$workspace = ${workspaceExpr}`);
     lines.push(`if (-not $existing.ContainsKey(${quoteSingle(role.id)})) {`);
     lines.push(`    Write-Host ${quoteSingle(`adding agent ${role.id}`)}`);
-    lines.push(`    & $openclawCmd agents add ${role.id} --workspace $workspace --non-interactive${role.binding ? ` --bind ${quoteSingle(`feishu:${role.binding}`)}` : ""}`);
+    lines.push(`    & $openclawCmd agents add ${role.id} --workspace $workspace --non-interactive --bind ${quoteSingle(`feishu:${role.binding}`)}`);
     lines.push(`    if ($LASTEXITCODE -ne 0) { throw 'failed to add ${role.id}' }`);
-    if (role.binding) {
-      lines.push("} else {");
-      lines.push(`    Write-Host ${quoteSingle(`binding existing agent ${role.id}`)}`);
-      lines.push(`    & $openclawCmd agents bind --agent ${role.id} --bind ${quoteSingle(`feishu:${role.binding}`)}`);
-      lines.push(`    if ($LASTEXITCODE -ne 0) { throw 'failed to bind ${role.id}' }`);
-      lines.push("}");
-    } else {
-      lines.push("}");
-    }
+    lines.push("} else {");
+    lines.push(`    Write-Host ${quoteSingle(`binding existing agent ${role.id}`)}`);
+    lines.push(`    & $openclawCmd agents bind --agent ${role.id} --bind ${quoteSingle(`feishu:${role.binding}`)}`);
+    lines.push(`    if ($LASTEXITCODE -ne 0) { throw 'failed to bind ${role.id}' }`);
+    lines.push("}");
   }
 
   lines.push("");
@@ -217,21 +209,24 @@ function renderApplyScript(config, resolvedRoles) {
 
 function generateArtifacts(projectRoot, rawConfig) {
   const config = normalizeConfig(rawConfig);
-  const generatedDir = path.join(projectRoot, "generated");
-  ensureDir(generatedDir);
+  const enabledRoles = config.roles.filter((role) => role.enabled);
+  if (enabledRoles.length === 0) {
+    throw new Error("请至少启用一个角色后再生成工作区。");
+  }
 
-  for (const role of config.roles) {
-    if (role.enabled && !role.binding) {
-      throw new Error(`Enabled role ${role.id} requires a Feishu group ID.`);
+  for (const role of enabledRoles) {
+    if (!role.binding) {
+      throw new Error(`已启用角色“${role.name || role.id}”缺少飞书群 ID。`);
     }
   }
 
-  const resolvedRoles = config.roles
-    .filter((role) => role.enabled)
-    .map((role) => ({
-      ...role,
-      workspaceRelative: resolveRoleWorkspace(projectRoot, role)
-    }));
+  const generatedDir = path.join(projectRoot, "generated");
+  ensureDir(generatedDir);
+
+  const resolvedRoles = enabledRoles.map((role) => ({
+    ...role,
+    workspaceRelative: resolveRoleWorkspace(projectRoot, role)
+  }));
 
   const applyScript = renderApplyScript(config, resolvedRoles);
   const applyScriptPath = path.join(generatedDir, config.outputScriptName);
