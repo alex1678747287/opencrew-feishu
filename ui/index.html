@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpenCrew Feishu Control</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">OpenCrew x Feishu</p>
+          <h1>Role Control Studio</h1>
+          <p class="lede">
+            Create roles, bind Feishu groups, and generate a portable OpenClaw split-agent package without editing raw config by hand.
+          </p>
+        </div>
+        <div class="hero-meta">
+          <div class="stat">
+            <span class="stat-label">Mode</span>
+            <strong>Split-Agent Ready</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Output</span>
+            <strong>Config + Apply Script</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel panel-grid">
+        <div class="stack">
+          <div class="section-head">
+            <h2>Project</h2>
+            <p>Global settings for this local repo.</p>
+          </div>
+          <label class="field">
+            <span>Project name</span>
+            <input id="projectName" type="text">
+          </label>
+          <label class="field">
+            <span>OpenClaw command</span>
+            <input id="openclawCmd" type="text">
+          </label>
+          <label class="field">
+            <span>Generated script name</span>
+            <input id="outputScriptName" type="text">
+          </label>
+          <div class="actions">
+            <button id="resetDefaults" class="ghost">Reset defaults</button>
+            <button id="saveConfig" class="ghost">Save config</button>
+            <button id="generateAssets" class="primary">Generate assets</button>
+          </div>
+          <div class="actions">
+            <button id="downloadConfig" class="ghost">Download config</button>
+            <button id="downloadScript" class="ghost">Download script</button>
+            <label class="ghost file-button">
+              <input id="importConfig" type="file" accept=".json">
+              Import config
+            </label>
+          </div>
+          <div id="statusBar" class="status">Loading current config...</div>
+        </div>
+
+        <div class="stack notes-card">
+          <div class="section-head">
+            <h2>Notes</h2>
+            <p>How this UI maps to the repo.</p>
+          </div>
+          <ul class="plain-list">
+            <li>Built-in roles reuse the scaffold under <code>scaffold/</code>.</li>
+            <li>Custom roles are generated under <code>roles/&lt;id&gt;/</code>.</li>
+            <li>Feishu group IDs should be entered without the <code>feishu:</code> prefix.</li>
+            <li>The generated apply script is portable and resolves paths relative to this repo.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head section-head-row">
+          <div>
+            <h2>Roles</h2>
+            <p>Use built-in OpenCrew roles or create your own generated role workspaces.</p>
+          </div>
+          <button id="addRole" class="primary subtle">Add custom role</button>
+        </div>
+        <div id="roleList" class="role-list"></div>
+      </section>
+
+      <section class="panel panel-grid previews">
+        <div class="stack">
+          <div class="section-head">
+            <h2>Config preview</h2>
+            <p>The exact JSON that will be saved and reused on other machines.</p>
+          </div>
+          <pre id="configPreview" class="code-block"></pre>
+        </div>
+        <div class="stack">
+          <div class="section-head">
+            <h2>Generated apply script</h2>
+            <p>Created after you click Generate assets.</p>
+          </div>
+          <pre id="scriptPreview" class="code-block muted">No script generated yet.</pre>
+        </div>
+      </section>
+    </main>
+
+    <template id="roleTemplate">
+      <article class="role-card">
+        <div class="role-top">
+          <div class="role-title">
+            <input class="role-enabled" type="checkbox">
+            <div>
+              <h3 class="role-heading"></h3>
+              <p class="role-caption"></p>
+            </div>
+          </div>
+          <button class="danger remove-role" type="button">Remove</button>
+        </div>
+
+        <div class="role-grid">
+          <label class="field">
+            <span>Mode</span>
+            <select class="role-mode">
+              <option value="builtin">Built-in</option>
+              <option value="custom">Custom</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Preset</span>
+            <select class="role-preset">
+              <option value="cos">CoS</option>
+              <option value="cto">CTO</option>
+              <option value="builder">Builder</option>
+              <option value="ko">KO</option>
+              <option value="ops">Ops</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Role ID</span>
+            <input class="role-id" type="text">
+          </label>
+          <label class="field">
+            <span>Display name</span>
+            <input class="role-name" type="text">
+          </label>
+          <label class="field">
+            <span>Emoji</span>
+            <input class="role-emoji" type="text">
+          </label>
+          <label class="field">
+            <span>Feishu group ID</span>
+            <input class="role-binding" type="text" placeholder="oc_xxx">
+          </label>
+          <label class="field field-span-2">
+            <span>Role title</span>
+            <input class="role-title-input" type="text">
+          </label>
+          <label class="field field-span-2">
+            <span>Vibe</span>
+            <input class="role-vibe" type="text">
+          </label>
+          <label class="field field-span-2">
+            <span>Mission</span>
+            <textarea class="role-mission" rows="2"></textarea>
+          </label>
+          <label class="field field-span-2">
+            <span>Responsibilities</span>
+            <textarea class="role-responsibilities" rows="4" placeholder="One line per responsibility"></textarea>
+          </label>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
