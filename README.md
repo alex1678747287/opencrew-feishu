@@ -1,12 +1,44 @@
-# OpenCrew Feishu V1
+# OpenCrew Feishu
 
-This scaffold adapts the OpenCrew operating model to OpenClaw plus Feishu with the smallest safe change set.
+Local control studio for running an OpenCrew-style workflow on top of OpenClaw and Feishu.
 
-## Local UI
+This repo gives you:
 
-This repo now includes a local configuration UI.
+- a local UI for role configuration and scaffold generation
+- a single-HQ operating mode for shared Feishu groups
+- a `TID`-based task workflow with handoff, checkpoint, approval, and closeout actions
+- a runtime board that derives current state from task files and append-only audit events
 
-Start it with:
+## Why This Exists
+
+OpenCrew assumes `channel = role` and `thread = task`.
+That model does not map cleanly onto a Feishu setup where one visible bot may need to coordinate multiple internal roles inside shared groups.
+
+This project keeps the external surface simple:
+
+- one visible HQ speaker in Feishu
+- internal roles such as `CoS`, `CTO`, `Builder`, `KO`, and `Ops`
+- explicit task isolation through `runtime/tasks/<TID>.md`
+- a local control studio for generating workspaces, bindings, and runtime views
+
+## What It Implements
+
+- OpenCrew-style coordination rules: QAPS, autonomy levels, checkpoints, closeouts, and A2A handoffs
+- a Feishu-first task model that uses `TID` files instead of chat-thread state
+- a local runtime board for active, blocked, approval-waiting, and closed work
+- a shared task engine used by both the UI and PowerShell scripts
+- append-only task event logs for audit and recovery
+- a later split-agent path for `CoS`, `CTO`, and `Builder`
+
+## Quick Start
+
+Requirements:
+
+- Windows PowerShell
+- Node.js
+- OpenClaw installed locally
+
+Start the local UI:
 
 ```powershell
 npm start
@@ -18,7 +50,13 @@ Then open:
 http://127.0.0.1:3210
 ```
 
-The UI lets you:
+Run tests:
+
+```powershell
+npm test
+```
+
+## What The UI Can Do
 
 - define built-in and custom roles
 - assign Feishu group IDs
@@ -26,111 +64,98 @@ The UI lets you:
 - generate custom role workspaces under `roles/`
 - generate a portable apply script under `generated/`
 - visualize live task orchestration from `runtime/tasks/`
-- see which internal role is currently planning, executing, blocked, or waiting approval
-- inspect the single-bot command center, task timeline, and current CoS supervision focus
-- create and advance `TID` tasks directly in the UI with auto-focus targeting
-- review tasks in a GitHub Projects-style state board
+- inspect task dependencies, audit events, and current role ownership
+- create and advance `TID` tasks directly in the UI
+- review work in a GitHub Projects-style state board
 
-The generated apply script uses paths relative to the repo, so the same repo can be copied to another Windows machine and reused there.
+The generated apply script uses repo-relative paths so the same repository can be moved to another Windows machine and reused there.
 
-## What This Implements
+## Workflow Model
 
-- OpenCrew-style coordination rules: QAPS, autonomy levels, checkpoints, closeouts, and A2A handoffs
-- A Feishu-first task model that uses `TID` instead of Slack threads
-- A single visible HQ bot mode for immediate use
-- A later split-agent path for `CoS`, `CTO`, and `Builder`
+The safest rollout shape for Feishu is:
 
-## Why This Shape
+1. Keep one visible HQ bot now.
+2. Run OpenCrew roles as internal logic.
+3. Use `TID` files plus handoff, checkpoint, approval, and closeout blocks for task isolation.
+4. Split into dedicated agents only after the flow is stable.
 
-OpenCrew assumes `channel = role` and `thread = task`.
-Feishu in your current OpenClaw setup can handle role routing, but it does not give you the same thread isolation.
-The safest minimal path is:
+Key runtime upgrades already included here:
 
-1. Keep one visible HQ bot now
-2. Run OpenCrew roles as internal logic
-3. Use `TID` plus checkpoint and closeout blocks for task isolation
-4. Split into real agents only after the flow is stable
+- `Priority`, `DependsOn`, and `HumanGate` task headers
+- checklist-based `## Plan` sections
+- append-only `## Event Log` audit trails
+- explicit `approve` and `reject` actions for `waiting_approval`
+- closed-task guardrails that block further workflow mutation
+- dependency and downstream visibility in the runtime board
 
-## Layout
+## Repository Layout
 
-- `runtime/HQ_PROTOCOL.md`
-  Used by the current main bot in shared Feishu contexts
-- `runtime/HQ_PLAYBOOK.md`
-  Practical single-HQ operating notes for day-to-day use
-- `runtime/HQ_SUPERVISION.md`
-  How one visible bot dispatches internal roles, monitors progress, and exposes state in the local UI
-- `runtime/TASKS.md`
-  Task file convention and script usage
-- `scaffold/shared/`
-  Shared rules and templates derived from OpenCrew concepts
-- `scaffold/hq-single/`
-  A ready workspace template for one visible HQ bot
-- `scaffold/cos/`, `scaffold/cto/`, `scaffold/builder/`
-  Ready workspace templates for the later split-agent path
-- `scripts/emit-opencrew-feishu-core.ps1`
-  Generates an apply script that adds and binds split agents once Feishu chat IDs are known
-- `scripts/new-hq-task.ps1`
-  Creates a `TID` and a task file for the current HQ workflow
-- `scripts/emit-hq-block.ps1`
-  Emits checkpoint, closeout, handoff, or ops review blocks
-- `scripts/update-hq-task.ps1`
-  Routes CLI task actions into the shared workflow engine: handoff, checkpoint, edit-metadata, toggle-plan, approve, reject, ops-review, and closeout
+- `app/`
+  Local server, generator, task engine, and runtime board logic.
+- `ui/`
+  Browser UI for configuration, generation, and runtime operations.
+- `runtime/`
+  HQ protocol, playbook, supervision notes, and task-file conventions.
+- `scaffold/`
+  Shared prompt assets plus built-in role workspaces.
+- `scripts/`
+  PowerShell entrypoints for task creation, updates, and scaffold emission.
+- `config/`
+  Sample configuration and local config output.
+- `test/`
+  Regression tests for generation, runtime timeline, workflow, and guardrails.
 
-## Recommended Rollout
+## Main Files
 
-### Phase 1
-
-- Keep the current main bot
-- Load `runtime/HQ_PROTOCOL.md` in shared Feishu contexts
-- Use logical roles only: `CoS`, `CTO`, `Builder`, with optional `KO` and `Ops`
-- Let `CoS` remain the only visible speaker in Feishu, but use `TID` task files plus handoff/checkpoint blocks as the internal supervision spine
-- Open the local UI to watch the runtime board, task timeline, CoS focus, and current role status inferred from `runtime/tasks`
-
-### Phase 2
-
-- Create dedicated agents for `CoS`, `CTO`, and `Builder`
-- Bind each one to a dedicated Feishu group
-- Keep the same shared protocol files
+- [`runtime/HQ_PROTOCOL.md`](runtime/HQ_PROTOCOL.md)
+  Shared protocol for the current single-HQ operating mode.
+- [`runtime/HQ_PLAYBOOK.md`](runtime/HQ_PLAYBOOK.md)
+  Practical operating notes for day-to-day use.
+- [`runtime/HQ_SUPERVISION.md`](runtime/HQ_SUPERVISION.md)
+  How one visible bot supervises internal roles and what the local board should expose.
+- [`runtime/TASKS.md`](runtime/TASKS.md)
+  Task file conventions and event-log rules.
+- [`scripts/emit-opencrew-feishu-core.ps1`](scripts/emit-opencrew-feishu-core.ps1)
+  Generates an apply script that adds and binds split agents once Feishu group IDs are known.
+- [`scripts/new-hq-task.ps1`](scripts/new-hq-task.ps1)
+  Creates a `TID` and a task file for the HQ workflow.
+- [`scripts/update-hq-task.ps1`](scripts/update-hq-task.ps1)
+  Routes CLI actions into the shared workflow engine.
 
 ## Repo Portability
 
-Commit this repo and carry it to other machines.
-
 Suggested setup on another Windows machine:
 
-1. clone the repo
-2. run `npm start`
-3. open the UI
-4. adjust the local OpenClaw command if needed
-5. generate the apply script
-6. run the generated script after confirming the Feishu group IDs
+1. Clone the repo.
+2. Run `npm start`.
+3. Open the UI.
+4. Adjust the local OpenClaw command if needed.
+5. Generate the apply script.
+6. Run the generated script after confirming the Feishu group IDs.
 
 ## Model Strategy
 
 This scaffold is model-agnostic by design.
 Do not bind roles to a fixed vendor model.
-Prefer this capability split instead:
+
+Prefer a capability split like this:
 
 - router: cheap and fast
 - worker: default execution
 - deep: planning, review, and difficult cases
 - vision: only when image reasoning is required
 
+## Current Status
+
+- local UI works
+- runtime board and task engine are implemented
+- shared workflow guardrails are covered by tests
+- repository is public, but no OSS license has been chosen yet
+
+Without an explicit license, the repo is visible but not properly open-source for reuse.
+
 ## Sources
 
 - OpenCrew README
 - OpenCrew concepts and architecture docs
 - OpenCrew Feishu setup and deploy docs
-
-## Workflow Upgrades
-
-- Tasks now support   `Priority`,   `DependsOn`, and   `HumanGate` headers.
-- The   `## Plan` section now supports checklist items like   `- [ ] step` and   `- [x] done`.
-- Tasks now keep an append-only   `## Event Log`   section so create/update actions remain auditable even when current header state changes.
-- The runtime board now reduces workflow fields such as state, owner, and human gate from the event log first, while still reading task metadata like goal and dependencies from the current header snapshot.
-- The runtime board surfaces dependency-blocked tasks, but keeps ready work ahead of purely waiting-on-upstream work.
-- The local UI task form now creates richer TID files instead of only goal plus acceptance.
-- The runtime action form can now edit metadata, toggle checklist items, and explicitly approve or reject waiting tasks.
-- `approve` and `reject` are only valid when the task is actually in `waiting_approval`; they no longer act as free-form status flips.
-- Once a task is `done` or `cancelled`, further workflow mutations such as handoff, checkpoint, ops review, checklist toggles, or duplicate closeout are rejected; metadata corrections can still be made explicitly.
-- The selected task view now shows recent audit events in addition to dependency chains and checklist progress.

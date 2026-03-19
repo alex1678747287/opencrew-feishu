@@ -1,8 +1,17 @@
 {
   "name": "opencrew-feishu",
   "version": "0.1.0",
+  "description": "Local control studio for OpenCrew-style Feishu workflows on top of OpenClaw.",
   "private": true,
   "type": "commonjs",
+  "keywords": [
+    "opencrew",
+    "feishu",
+    "openclaw",
+    "workflow",
+    "orchestration",
+    "runtime-board"
+  ],
   "scripts": {
     "start": "node app/server.js",
     "test": "node --test"
