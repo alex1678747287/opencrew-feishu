@@ -58,6 +58,18 @@ Run tests:
 npm test
 ```
 
+Health check:
+
+```text
+GET http://127.0.0.1:3210/api/health
+```
+
+Common API error semantics:
+
+- `400` invalid request payload or validation failure
+- `404` missing API route or task file does not exist
+- `409` workflow conflict such as approving a task that is not in `waiting_approval`
+
 ## What The UI Can Do
 
 - define built-in and custom roles
@@ -68,6 +80,7 @@ npm test
 - visualize live task orchestration from `runtime/tasks/`
 - inspect task dependencies, audit events, and current role ownership
 - create and advance `TID` tasks directly in the UI
+- manually refresh the runtime board and see the latest successful refresh time
 - review work in a GitHub Projects-style state board
 
 The generated apply script uses repo-relative paths so the same repository can be moved to another Windows machine and reused there.
@@ -151,10 +164,11 @@ Prefer a capability split like this:
 
 - local UI works
 - runtime board and task engine are implemented
+- runtime server now exposes `/api/health` and structured API error codes
 - shared workflow guardrails are covered by tests
-- repository is public, but no OSS license has been chosen yet
+- repository is public under the MIT License
 
-Without an explicit license, the repo is visible but not properly open-source for reuse.
+The runtime board also shows an explicit manual refresh entry and latest-refresh feedback so operators can tell whether the local view is current.
 
 ## Sources
 

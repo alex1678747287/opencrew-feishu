@@ -228,6 +228,13 @@
             <h2>任务流</h2>
             <p>根据 `runtime/tasks` 下的 TID 文件自动解析当前负责人、最新进度和建议指令。</p>
           </div>
+          <div class="runtime-toolbar">
+            <div class="runtime-refresh-meta">
+              <span class="summary-label">Runtime Refresh</span>
+              <strong id="runtimeRefreshLabel">Not loaded yet</strong>
+            </div>
+            <button id="runtimeRefreshButton" class="ghost" type="button">Refresh now</button>
+          </div>
         </div>
         <div id="taskBoard" class="task-board"></div>
       </section>

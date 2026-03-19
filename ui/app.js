@@ -18,6 +18,8 @@ const state = {
   defaults: null,
   generated: null,
   runtimeBoard: null,
+  runtimeLastRefreshAt: 0,
+  runtimeLastRefreshError: "",
   runtimeSelectedTid: "",
   runtimeRefreshInFlight: false,
   runtimeRefreshQueued: false,
@@ -115,6 +117,8 @@ const elements = {
   runtimeAutoTargetTid: document.getElementById("runtimeAutoTargetTid"),
   runtimeBlockedCount: document.getElementById("runtimeBlockedCount"),
   runtimeFollowFocus: document.getElementById("runtimeFollowFocus"),
+  runtimeRefreshButton: document.getElementById("runtimeRefreshButton"),
+  runtimeRefreshLabel: document.getElementById("runtimeRefreshLabel"),
   runtimeModeApprove: document.getElementById("runtimeModeApprove"),
   runtimeModeBadge: document.getElementById("runtimeModeBadge"),
   runtimeModeCheckpoint: document.getElementById("runtimeModeCheckpoint"),
@@ -168,6 +172,49 @@ function requestJson(url, options = {}) {
 function setStatus(message, kind = "") {
   elements.statusBar.textContent = message;
   elements.statusBar.className = `status ${kind}`.trim();
+}
+
+function formatRuntimeRefreshTime(timestamp) {
+  if (!timestamp) {
+    return "Not loaded yet";
+  }
+
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
+
+function renderRuntimeRefreshLabel() {
+  if (!elements.runtimeRefreshLabel || !elements.runtimeRefreshButton) {
+    return;
+  }
+
+  if (state.runtimeRefreshInFlight) {
+    elements.runtimeRefreshLabel.textContent = state.runtimeLastRefreshAt
+      ? `Refreshing... last ok ${formatRuntimeRefreshTime(state.runtimeLastRefreshAt)}`
+      : "Refreshing runtime board...";
+    elements.runtimeRefreshButton.disabled = true;
+    return;
+  }
+
+  elements.runtimeRefreshButton.disabled = false;
+
+  if (state.runtimeLastRefreshError) {
+    const suffix = state.runtimeLastRefreshAt
+      ? ` Last ok ${formatRuntimeRefreshTime(state.runtimeLastRefreshAt)}`
+      : "";
+    elements.runtimeRefreshLabel.textContent = `Refresh failed.${suffix}`;
+    return;
+  }
+
+  if (state.runtimeLastRefreshAt) {
+    elements.runtimeRefreshLabel.textContent = `Last updated ${formatRuntimeRefreshTime(state.runtimeLastRefreshAt)}`;
+    return;
+  }
+
+  elements.runtimeRefreshLabel.textContent = "Not loaded yet";
 }
 
 function setScriptPreview(content = SCRIPT_PLACEHOLDER, muted = true) {
@@ -1415,6 +1462,9 @@ function renderRuntimeBoard() {
     elements.taskCommandList.innerHTML = '<div class="runtime-empty">暂无调度建议。</div>';
     elements.roleRuntimeBoard.innerHTML = '<div class="runtime-empty">暂无角色运行数据。</div>';
     elements.taskBoard.innerHTML = '<div class="runtime-empty">`runtime/tasks` 里还没有任务文件。</div>';
+    if (state.runtimeRefreshInFlight) {
+      elements.taskBoard.innerHTML = '<div class="runtime-empty is-loading">Loading runtime board...</div>';
+    }
     elements.hqVisibleSpeaker.textContent = "CoS";
     elements.hqFocusTid.textContent = "暂无";
     elements.hqFocusRole.textContent = "暂无";
@@ -1432,6 +1482,7 @@ function renderRuntimeBoard() {
     elements.hqStageHint.textContent = "创建 TID 后，这里会显示当前总指挥的监工状态。";
     syncRuntimeTaskEditor(null);
     syncRuntimeModePanel();
+    renderRuntimeRefreshLabel();
     return;
   }
 
@@ -1608,9 +1659,12 @@ function renderRuntimeBoard() {
       setRuntimeSelectedTid(item.dataset.runtimeTid, { silent: true });
     });
   }
+
+  renderRuntimeRefreshLabel();
 }
 
 async function refreshRuntimeBoard(silent = false) {
+  renderRuntimeRefreshLabel();
   if (state.runtimeRefreshInFlight) {
     state.runtimeRefreshQueued = true;
     state.runtimeRefreshQueuedSilent = state.runtimeRefreshQueuedSilent && silent;
@@ -1618,15 +1672,21 @@ async function refreshRuntimeBoard(silent = false) {
   }
 
   state.runtimeRefreshInFlight = true;
+  state.runtimeLastRefreshError = "";
+  renderRuntimeRefreshLabel();
   try {
     state.runtimeBoard = await requestJson("/api/runtime-board");
+    state.runtimeLastRefreshAt = Date.now();
     renderRuntimeBoard();
   } catch (error) {
+    state.runtimeLastRefreshError = error.message || "runtime refresh failed";
     if (!silent) {
       setStatus(error.message || "运行态加载失败。", "error");
     }
+    renderRuntimeBoard();
   } finally {
     state.runtimeRefreshInFlight = false;
+    renderRuntimeRefreshLabel();
     if (state.runtimeRefreshQueued) {
       const queuedSilent = state.runtimeRefreshQueuedSilent;
       state.runtimeRefreshQueued = false;
@@ -1966,6 +2026,9 @@ elements.runtimeFollowFocus.addEventListener("click", () => {
   state.runtimeSelectedTid = getRuntimeFocusTid(state.runtimeBoard);
   renderRuntimeBoard();
   setStatus("已恢复为自动跟随当前焦点任务。", "ok");
+});
+elements.runtimeRefreshButton.addEventListener("click", () => {
+  refreshRuntimeBoard(false);
 });
 elements.createTaskButton.addEventListener("click", () => {
   createRuntimeTask();

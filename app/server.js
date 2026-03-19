@@ -16,6 +16,8 @@ const { buildRuntimeBoard } = require("./runtime-board");
 const projectRoot = path.resolve(__dirname, "..");
 const uiRoot = path.join(projectRoot, "ui");
 const port = Number(process.env.PORT || 3210);
+const packageJsonPath = path.join(projectRoot, "package.json");
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -29,13 +31,48 @@ const MIME_TYPES = {
 };
 
 function sendJson(response, statusCode, payload) {
-  response.writeHead(statusCode, { "Content-Type": MIME_TYPES[".json"] });
+  response.writeHead(statusCode, {
+    "Content-Type": MIME_TYPES[".json"],
+    "Cache-Control": "no-store"
+  });
   response.end(JSON.stringify(payload, null, 2));
 }
 
 function sendText(response, statusCode, body) {
   response.writeHead(statusCode, { "Content-Type": MIME_TYPES[".txt"] });
   response.end(body);
+}
+
+function inferErrorStatus(error, pathname) {
+  const message = String(error?.message || "").toLowerCase();
+
+  if (message.includes("task does not exist")) {
+    return 404;
+  }
+
+  if (
+    message.includes("cannot approve a closed task") ||
+    message.includes("cannot reject a closed task") ||
+    message.includes("cannot closeout a closed task") ||
+    message.includes("cannot checkpoint a closed task") ||
+    message.includes("cannot handoff a closed task") ||
+    message.includes("cannot ops-review a closed task") ||
+    message.includes("cannot toggle-plan a closed task") ||
+    message.includes("requires waiting_approval state")
+  ) {
+    return 409;
+  }
+
+  if (
+    pathname === "/api/config" ||
+    pathname === "/api/generate" ||
+    pathname === "/api/runtime/tasks" ||
+    /^\/api\/runtime\/tasks\/[^/]+\/actions$/.test(pathname)
+  ) {
+    return 400;
+  }
+
+  return 500;
 }
 
 function readBody(request) {
@@ -50,6 +87,15 @@ function readBody(request) {
 async function handleApi(request, response, pathname) {
   try {
     const runtimeActionMatch = /^\/api\/runtime\/tasks\/([^/]+)\/actions$/.exec(pathname);
+
+    if (request.method === "GET" && pathname === "/api/health") {
+      return sendJson(response, 200, {
+        ok: true,
+        service: packageJson.name,
+        version: packageJson.version,
+        runtimeTasksDir: path.join(projectRoot, "runtime", "tasks")
+      });
+    }
 
     if (request.method === "GET" && pathname === "/api/config") {
       return sendJson(response, 200, { config: loadExistingConfig(projectRoot) });
@@ -120,7 +166,7 @@ async function handleApi(request, response, pathname) {
 
     return sendJson(response, 404, { error: "Not found" });
   } catch (error) {
-    return sendJson(response, 400, {
+    return sendJson(response, inferErrorStatus(error, pathname), {
       ok: false,
       error: error.message
     });
@@ -146,20 +192,40 @@ function serveStatic(response, filePath) {
   fs.createReadStream(normalized).pipe(response);
 }
 
-const server = http.createServer(async (request, response) => {
-  const url = new URL(request.url, `http://${request.headers.host}`);
-  const pathname = url.pathname;
+function createAppServer() {
+  return http.createServer(async (request, response) => {
+    const url = new URL(request.url, `http://${request.headers.host}`);
+    const pathname = url.pathname;
 
-  if (pathname.startsWith("/api/")) {
-    await handleApi(request, response, pathname);
-    return;
-  }
+    if (pathname.startsWith("/api/")) {
+      await handleApi(request, response, pathname);
+      return;
+    }
 
-  const target = pathname === "/" ? "index.html" : pathname.slice(1);
-  const filePath = path.join(uiRoot, target);
-  serveStatic(response, filePath);
-});
+    const target = pathname === "/" ? "index.html" : pathname.slice(1);
+    const filePath = path.join(uiRoot, target);
+    serveStatic(response, filePath);
+  });
+}
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`OpenCrew Feishu UI: http://127.0.0.1:${port}`);
-});
+function startServer(listenPort = port, host = "127.0.0.1") {
+  const server = createAppServer();
+  return new Promise((resolve) => {
+    server.listen(listenPort, host, () => {
+      resolve(server);
+    });
+  });
+}
+
+if (require.main === module) {
+  startServer().then((server) => {
+    const address = server.address();
+    const resolvedPort = typeof address === "object" && address ? address.port : port;
+    console.log(`OpenCrew Feishu UI: http://127.0.0.1:${resolvedPort}`);
+  });
+}
+
+module.exports = {
+  createAppServer,
+  startServer
+};

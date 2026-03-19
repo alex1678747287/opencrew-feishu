@@ -277,6 +277,24 @@ h2 {
   gap: 10px;
 }
 
+.runtime-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.runtime-refresh-meta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  text-align: right;
+}
+
+.runtime-refresh-meta strong {
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+
 .badge,
 .role-chip {
   display: inline-flex;
@@ -719,6 +737,11 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+.runtime-empty.is-loading {
+  border-style: dashed;
+  background: rgba(240, 247, 250, 0.7);
 }
 
 .runtime-meta-card {
@@ -1732,6 +1755,16 @@ button:hover,
 }
 
 @media (max-width: 900px) {
+  .runtime-toolbar {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .runtime-refresh-meta {
+    justify-items: start;
+    text-align: left;
+  }
+
   .hero-flow,
   .action-cluster.secondary,
   .compact-field-grid,
