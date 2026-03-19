@@ -2,6 +2,8 @@
 
 Local control studio for running an OpenCrew-style workflow on top of OpenClaw and Feishu.
 
+Chinese documentation: [`docs/README.zh-CN.md`](docs/README.zh-CN.md)
+
 This repo gives you:
 
 - a local UI for role configuration and scaffold generation
