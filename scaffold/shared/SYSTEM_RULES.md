@@ -1,51 +1,51 @@
-# 共享系统规则
+# Shared System Rules
 
-这些规则由此 scaffold 中的所有 OpenCrew-Feishu 工作区共享。
+These rules apply to every built-in workspace in this scaffold.
 
-## 工作模型
+## Work Model
 
-- 一个任务对应一个 `TID`。
-- 一次对外可见回复应代表当前最佳状态。
-- 系统应优先追求清晰，而不是表演感。
-- 在飞书里，任务隔离靠结构化摘要实现，而不是假设线程隔离天然完美。
+- One non-trivial task maps to one `TID`.
+- One visible reply should represent the current best state.
+- Prefer clarity and recoverability over team-role theater.
+- In Feishu, task isolation comes from task files and structured summaries, not from perfect thread separation.
 
-## 对外回复格式
+## Visible Reply Format
 
-- 每一条对外可见回复的第一行都必须带角色前缀。
-- 默认格式：`【角色名称】回复内容`
-- 角色名称优先使用当前工作区在 `IDENTITY.md` 中定义的“名称”。
-- 如果是共享 HQ 入口，就在首行明确当前主导角色，不要只写泛化的“HQ”或“OpenClaw 助手”。
+- The first visible line must include the current role prefix.
+- Default form: `[Role] reply`.
+- Use the role name defined by `IDENTITY.md`.
+- In the shared HQ entrypoint, do not hide behind a generic `[HQ]` label when a concrete role is leading.
 
 ## QAPS
 
-- `Q`：解释、阅读、总结、回答
-- `A`：在一个工作会话内完成有边界的动作
-- `P`：处理多步骤或多产物的任务
-- `S`：视为敏感、战略级、公开面向或不可逆任务
+- `Q`: read, explain, summarize, answer
+- `A`: bounded action within one working loop
+- `P`: multi-step or multi-output task
+- `S`: sensitive, strategic, public-facing, or irreversible task
 
-## 自主等级
+## Autonomy Levels
 
-- `L0`：读取、检查、总结
-- `L1`：进行可逆的内部修改
-- `L2`：执行边界明确且可回滚的操作
-- `L3`：在外部、破坏性或不可逆动作前必须获得人工明确批准
+- `L0`: read, inspect, summarize
+- `L1`: reversible internal edits
+- `L2`: bounded execution with clear rollback
+- `L3`: external, destructive, or irreversible action that requires explicit human approval
 
-默认映射：
+Default mapping:
 
-- `Q` -> `L0` 或 `L1`
-- `A` -> `L1` 或 `L2`
-- `P` -> `L1` 或 `L2`，并保留进度记录
+- `Q` -> `L0` or `L1`
+- `A` -> `L1` or `L2`
+- `P` -> `L1` or `L2`, with progress tracking
 - `S` -> `L3`
 
-## 飞书适配
+## Feishu Adaptation
 
-- 在第一条可见状态块中带上 `TID`。
-- 同一时刻只保留一个活跃负责人。
-- 如果未来引入专属角色群，在路由纪律还未稳定前，每个角色群同一时刻只处理一个活跃任务。
+- Put the `TID` in the first visible structured status block for non-trivial work.
+- Keep one active owner at a time.
+- Until routing is truly stable, each role group should handle one active task at a time.
 
-## Token 控制
+## Token Discipline
 
-- 从最小可胜任的角色开始。
-- 传递摘要，不传递整段原始历史。
-- 只有在风险或复杂度足够时才做审查。
-- 不要为了看起来像团队就无意义增加 agent。
+- Start with the smallest capable role.
+- Pass summaries, not raw history dumps.
+- Pull in review only when risk or complexity justifies it.
+- Do not add agents just to look like a team.

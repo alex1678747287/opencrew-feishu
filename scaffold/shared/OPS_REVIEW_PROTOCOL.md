@@ -1,25 +1,25 @@
-# 运维审查协议
+# Ops Review Protocol
 
-当任务风险足够高，需要 `Ops` 介入时使用此审查。
+Bring in `Ops` only when release, runtime, rollback, or execution-safety risk is real.
 
-## 审查点
+## When To Use
 
-1. 范围
-   变更是否有边界，是否说明清楚？
-2. 回滚
-   变更是否可以安全回退？
-3. 数据与密钥
-   是否暴露、移动或依赖敏感数据？
-4. 用户影响
-   是否会影响真实用户或共享渠道？
-5. 可运维性
-   是否有足够证据判断是否成功？
+- deployment or runtime stability is uncertain
+- rollback conditions are unclear
+- safety or continuity concerns block execution
+- a human needs a sharper risk summary before approval
 
-## 输出格式
+## Template
 
 ```text
-运维审查:
-- 结论: pass | pass_with_caution | hold
-- 主要关注点: <一句话>
-- 需要补救: <一句话或 none>
+Ops Review:
+- Verdict: pass | needs_fix
+- Main Concern: <primary risk or none>
+- Needed Mitigation: <required fix or none>
 ```
+
+## Rules
+
+- `pass` means the task may continue on the current path.
+- `needs_fix` means ownership should return to CoS for re-scope or remediation.
+- Keep the review concrete and short.

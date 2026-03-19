@@ -1,6 +1,8 @@
 generated/*
 !generated/.gitkeep
+roles/*
+!roles/.gitkeep
 runtime/tasks/*
 !runtime/tasks/.gitkeep
+scaffold/*/.openclaw/
 config/*.local.json
-

@@ -1,67 +1,72 @@
-# HQ 操作手册
+# HQ Playbook
 
-这是当前单一对外可见 HQ 机器人的操作手册。
+This playbook is for the current single-visible-bot mode.
 
-## 目标
+## Default Shape
 
-在飞书里运行 OpenCrew 协作模式，同时又不要求一开始就拆出全部专属角色 agent。
+- one visible HQ bot in Feishu
+- internal roles still follow the OpenCrew operating model
+- non-trivial work uses `TID` task files
+- progress is written back into `runtime/tasks/`
+- every finished task gets an explicit closeout
 
-## 默认形态
+## Role Order
 
-- 一个对外可见的 HQ 机器人
-- 仅存在内部逻辑角色
-- 对非简单任务使用 `TID`
-- 使用紧凑的进度记录
-- 每个完成任务保留一条结项
+Use the smallest capable role first:
 
-## 内部角色顺序
+1. `CoS` for triage, scope, approval, and closeout
+2. `CTO` for plan, technical boundary, and dependencies
+3. `Builder` for execution and evidence
+4. `Ops` only when runtime or release risk is material
+5. `KO` only when the result is worth turning into reusable knowledge
 
-采用最小可用顺序：
+## When To Create A Task File
 
-1. `CoS`
-   澄清请求、定义结果、设定验收标准。
-2. `CTO`
-   划定范围并定义下一位负责人。
-3. `Builder`
-   执行、验证、保留证据。
-4. `Ops`
-   只有在风险足够高时才介入审查。
-5. `KO`
-   只有在确实值得沉淀时才介入。
+Create a task file when any of these are true:
 
-## 何时创建任务文件
+- the work is `A`, `P`, or `S`
+- the work will span multiple visible replies
+- you need durable progress, approvals, or closeout
 
-以下情况创建任务文件：
+Pure `Q` work can usually stay as a direct answer.
 
-- 任何 `A`、`P` 或 `S` 类任务
-- 任何会跨越多条可见回复的任务
-- 任何大概率需要进度记录的任务
+## Local Commands
 
-纯 `Q` 类任务通常不需要任务文件。
+Task files use ASCII block names for PowerShell compatibility:
 
-## 本地命令
+- `Handoff`
+- `Progress`
+- `Ops Review`
+- `Closeout`
 
-创建任务文件：
+Create a task:
 
 ```powershell
 & 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\new-hq-task.ps1' -Type A -Goal 'Summarize the latest deployment issue' -Acceptance 'One clear summary and next step'
 ```
 
-输出进度块：
+Write a handoff:
 
 ```powershell
-& 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\emit-hq-block.ps1' -Mode checkpoint -Tid 'TID-20260313-1600-demo' -Status on_track -Completed 'Read logs and isolated the failing step' -Next 'Patch the config and re-run the health check'
+& 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\update-hq-task.ps1' -Tid 'TID-20260318-1400-demo' -Mode handoff -From 'CoS' -To 'CTO' -Ask 'Scope the request and write the minimum executable checklist' -Constraints 'Keep one visible external bot and short replies' -DoneWhen 'A short plan, clear acceptance, and the next owner'
 ```
 
-输出结项块：
+Write a checkpoint:
 
 ```powershell
-& 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\emit-hq-block.ps1' -Mode closeout -Tid 'TID-20260313-1600-demo' -Outcome done -Changed 'Added the Feishu HQ scaffold' -Evidence 'Script syntax checked and generator dry-run passed'
+& 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\update-hq-task.ps1' -Tid 'TID-20260318-1400-demo' -Mode checkpoint -Status on_track -Completed 'Read logs and isolated the failing step' -Next 'Patch the config and re-run the health check'
 ```
 
-## 对外纪律
+Write a closeout:
 
-- 不要在用户面前表演式展示内部聊天
-- 优先用简短任务块，不写冗长解释
-- 只有在进度记录能增加协同价值时才展示
-- 所有非简单任务都必须以结项收尾
+```powershell
+& 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe' -ExecutionPolicy Bypass -File 'C:\Users\Admin\opencrew-feishu\scripts\update-hq-task.ps1' -Tid 'TID-20260318-1400-demo' -Mode closeout -Outcome done -Changed 'Added the Feishu HQ scaffold' -Evidence 'Script syntax checked and generator dry-run passed'
+```
+
+## External Discipline
+
+- Do not stage fake internal chat in front of the user.
+- Use short structured task blocks instead of long raw transcripts.
+- Keep one current owner at a time.
+- Close every non-trivial task with an explicit closeout.
+- Let the local UI read `runtime/tasks/` and surface the current role, state, blockers, and next step.

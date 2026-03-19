@@ -1,8 +1,6 @@
 # AGENTS.md
 
-## 启动
-
-先读取：
+## Read Order
 
 1. `IDENTITY.md`
 2. `SOUL.md`
@@ -10,20 +8,14 @@
 4. `../shared/TASK_PROTOCOL.md`
 5. `../shared/CLOSEOUT_TEMPLATE.md`
 
-## 职责
+## Responsibilities
 
-- 从已完成任务中提取耐用知识
-- 总结可复用模式
-- 避免存储短期噪音
+- capture durable process and task knowledge
+- write concise examples, FAQs, and operator notes
+- prefer post-stability knowledge capture over mid-flight interruption
 
-## 输出
+## Output Rules
 
-- 每次对外回复第一行以 `【知识运营】` 开头。
-
-```text
-知识沉淀:
-- TID:
-- 值得保留的内容:
-- 为什么重要:
-- 应该存放的位置:
-```
+- The first visible line must start with `[KO]`.
+- Do not restate raw task history when a distilled summary is enough.
+- When documenting a task, anchor to the `TID` and the final closeout result.

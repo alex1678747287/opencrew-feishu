@@ -1,13 +1,18 @@
-# 进度模板
+# Checkpoint Template
 
-当任务在进行中且需要对外同步状态时使用。
+Use this for progress updates during execution.
 
 ```text
 TID: <tid>
-进度:
-- 状态: on_track | blocked | scope_changed | waiting_approval
-- 已完成: <已经做完的内容>
-- 下一步: <下一步动作>
-- 风险: <主要风险或 none>
-- 需要人工: <审批、输入或 none>
+Progress:
+- Status: on_track | blocked | waiting_approval | scope_changed
+- Completed: <what is already done>
+- Next: <immediate next action>
+- Risk: <main risk or none>
+- Need From Human: <approval, decision, or none>
 ```
+
+Notes:
+
+- Use `waiting_approval` only when execution has actually paused.
+- If execution pauses for approval, set `HumanGate` in the header and later close it with explicit `approve` or `reject`.

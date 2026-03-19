@@ -1,39 +1,69 @@
-# HQ 任务文件
+# HQ Task Files
 
-任务文件存放在 `runtime/tasks/` 下。
+Task files live under `runtime/tasks/`.
 
-## 目的
+## Purpose
 
-它们用带 `TID` 的耐用本地记录，替代 Slack 风格的线程隔离。
+These files are the local source of truth for HQ-style task coordination.
+They replace chat-thread isolation with explicit `TID` files that can be parsed,
+edited, audited, and recovered later.
 
-## 文件结构
+## Required Sections
 
-每个任务文件应保留：
+Each task file should keep these sections:
 
-- 当前任务块
-- 当前计划
-- 最新进度记录
-- 最终结项
+- task header metadata
+- `## Context`
+- `## Plan`
+- `## Latest Progress`
+- `## Event Log`
+- `## Closeout`
 
-保持文件紧凑，避免粘贴整段聊天历史。
+Keep the file compact. Do not paste long chat history into it.
 
-## 命名
+## Block Names
 
-格式：
+Use ASCII block titles and field names for compatibility with Windows PowerShell:
+
+- `Handoff`
+- `Progress`
+- `Ops Review`
+- `Closeout`
+
+Values may still be written in Chinese or English, but the block and field labels
+should stay in the default script format when possible.
+
+## Naming
 
 ```text
 TID-YYYYMMDD-HHMM-shortslug.md
 ```
 
-## 推荐流程
+## Recommended Flow
 
-1. 用 `new-hq-task.ps1` 创建任务文件
-2. 用任务块更新对外可见回复
-3. 只在必要时添加进度记录
-4. 最后用结项收尾
+1. Create the task with `new-hq-task.ps1` or the local UI.
+2. Keep the header current for goal, acceptance, dependencies, and human gate.
+3. Append workflow actions through the shared task engine instead of manual edits when possible.
+4. Close the task with an explicit closeout block.
 
-## 备注
+## Notes
 
-- `Q` 类任务通常可以跳过任务文件
-- `S` 类任务即使有任务文件，也必须在审批边界暂停
-- 一条好的结项，应让下一位接手者不用重看整段上下文
+- `Q` tasks can often skip a task file.
+- `S` tasks may still use a task file, but should pause at approval boundaries.
+- A good task file should let the next operator continue without rereading the whole history.
+
+## Extended Metadata
+
+- `Priority:` uses `P0` to `P3`.
+- `DependsOn:` is a comma-separated list of upstream TIDs, or `none`.
+- `HumanGate:` describes the exact human approval or decision gate, or `none`.
+- In `## Plan`, prefer checklist lines such as `- [ ] scope the task` and `- [x] validate output`.
+- The board derives the next step from the latest checkpoint first, then from the next unchecked plan item.
+
+## Event Log
+
+- Keep an append-only `## Event Log` section in each task file.
+- Each line should be a JSON event written by the shared task engine.
+- Use it for audit and recovery; do not rewrite old event lines when current task state changes.
+- The runtime board reduces workflow fields such as `State`, `Owner`, and `HumanGate` from the event log first.
+- Task metadata such as `Goal`, `Acceptance`, and `DependsOn` still comes from the current header snapshot.

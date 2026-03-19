@@ -25,6 +25,11 @@ The UI lets you:
 - save a local project config
 - generate custom role workspaces under `roles/`
 - generate a portable apply script under `generated/`
+- visualize live task orchestration from `runtime/tasks/`
+- see which internal role is currently planning, executing, blocked, or waiting approval
+- inspect the single-bot command center, task timeline, and current CoS supervision focus
+- create and advance `TID` tasks directly in the UI with auto-focus targeting
+- review tasks in a GitHub Projects-style state board
 
 The generated apply script uses paths relative to the repo, so the same repo can be copied to another Windows machine and reused there.
 
@@ -52,6 +57,8 @@ The safest minimal path is:
   Used by the current main bot in shared Feishu contexts
 - `runtime/HQ_PLAYBOOK.md`
   Practical single-HQ operating notes for day-to-day use
+- `runtime/HQ_SUPERVISION.md`
+  How one visible bot dispatches internal roles, monitors progress, and exposes state in the local UI
 - `runtime/TASKS.md`
   Task file convention and script usage
 - `scaffold/shared/`
@@ -66,6 +73,8 @@ The safest minimal path is:
   Creates a `TID` and a task file for the current HQ workflow
 - `scripts/emit-hq-block.ps1`
   Emits checkpoint, closeout, handoff, or ops review blocks
+- `scripts/update-hq-task.ps1`
+  Routes CLI task actions into the shared workflow engine: handoff, checkpoint, edit-metadata, toggle-plan, approve, reject, ops-review, and closeout
 
 ## Recommended Rollout
 
@@ -74,6 +83,8 @@ The safest minimal path is:
 - Keep the current main bot
 - Load `runtime/HQ_PROTOCOL.md` in shared Feishu contexts
 - Use logical roles only: `CoS`, `CTO`, `Builder`, with optional `KO` and `Ops`
+- Let `CoS` remain the only visible speaker in Feishu, but use `TID` task files plus handoff/checkpoint blocks as the internal supervision spine
+- Open the local UI to watch the runtime board, task timeline, CoS focus, and current role status inferred from `runtime/tasks`
 
 ### Phase 2
 
@@ -110,3 +121,16 @@ Prefer this capability split instead:
 - OpenCrew README
 - OpenCrew concepts and architecture docs
 - OpenCrew Feishu setup and deploy docs
+
+## Workflow Upgrades
+
+- Tasks now support   `Priority`,   `DependsOn`, and   `HumanGate` headers.
+- The   `## Plan` section now supports checklist items like   `- [ ] step` and   `- [x] done`.
+- Tasks now keep an append-only   `## Event Log`   section so create/update actions remain auditable even when current header state changes.
+- The runtime board now reduces workflow fields such as state, owner, and human gate from the event log first, while still reading task metadata like goal and dependencies from the current header snapshot.
+- The runtime board surfaces dependency-blocked tasks, but keeps ready work ahead of purely waiting-on-upstream work.
+- The local UI task form now creates richer TID files instead of only goal plus acceptance.
+- The runtime action form can now edit metadata, toggle checklist items, and explicitly approve or reject waiting tasks.
+- `approve` and `reject` are only valid when the task is actually in `waiting_approval`; they no longer act as free-form status flips.
+- Once a task is `done` or `cancelled`, further workflow mutations such as handoff, checkpoint, ops review, checklist toggles, or duplicate closeout are rejected; metadata corrections can still be made explicitly.
+- The selected task view now shows recent audit events in addition to dependency chains and checklist progress.

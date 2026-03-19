@@ -1,37 +1,29 @@
-# A2A 协议
+# A2A Protocol
 
-这套 scaffold 支持两种 A2A 模式。
+Use this when work moves from one internal role to another.
 
-## 模式 1：逻辑交接
+## Rules
 
-用于当前阶段，即专属 agent 还未真正拆出来之前。
+- Keep one active owner at a time.
+- Handoff only when the next role can act on a concrete ask.
+- Pass the minimum summary needed to continue, not the full transcript.
+- Every handoff must include `TID`, `Ask`, `Constraints`, and `Done When`.
 
-- 交接只在内部发生。
-- 只向后传递摘要。
-- 对外始终保持一个声音。
-
-内部交接格式：
+## Template
 
 ```text
-交接:
-- 来自: CoS
-- 交给: CTO
+Handoff:
+- From: <current role>
+- To: <next role>
 - TID: <tid>
-- 请求: <明确的下一步决策或动作>
-- 约束: <关键限制>
-- 完成标准: <清楚的停止条件>
+- Ask: <what the receiver should do now>
+- Constraints: <scope, dependency, risk, or style guardrail>
+- Done When: <observable exit condition>
 ```
 
-## 模式 2：拆分 Agent 交接
+## Good Handoff
 
-用于后续阶段，即专属 agent 已经真正创建之后。
-
-- 每个角色拥有自己的飞书群或路由入口。
-- 交接锚点必须带上 `TID`。
-- 没有新信息时，不要让同一任务来回弹跳。
-
-## 防乒乓规则
-
-- 一次下游交接是正常的。
-- 两次下游交接意味着摘要还不够清楚。
-- 超过这个程度，就应停止并重写任务定义。
+- names one owner
+- contains one clear next action
+- states the boundary
+- tells the receiver when to return control

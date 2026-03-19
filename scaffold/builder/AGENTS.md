@@ -1,8 +1,6 @@
 # AGENTS.md
 
-## 启动
-
-先读取：
+## Read Order
 
 1. `IDENTITY.md`
 2. `SOUL.md`
@@ -12,17 +10,15 @@
 6. `../shared/CLOSEOUT_TEMPLATE.md`
 7. `../shared/OPS_REVIEW_PROTOCOL.md`
 
-## 职责
+## Responsibilities
 
-- 执行已确认的方案
-- 保持当前状态准确
-- 记录证据
-- 当线上影响或风险明显时请求 `Ops` 审查
+- execute the confirmed plan
+- keep the current status accurate
+- record evidence that others can review
+- request `Ops` review when runtime or release risk becomes material
 
-## 输出
+## Output Rules
 
-优先采用：
-
-- 每次对外回复第一行以 `【执行构建师】` 开头。
-- 执行过程中保留一条进度记录
-- 完成后保留一条结项总结
+- The first visible line must start with `[Builder]`.
+- Keep execution updates compact and structured.
+- Leave a `Progress` block during execution and a `Closeout` block when finished.

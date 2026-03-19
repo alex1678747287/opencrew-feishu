@@ -7,6 +7,11 @@ const {
   loadExistingConfig,
   saveConfig
 } = require("./generator");
+const {
+  createTask,
+  updateTask
+} = require("./hq-tasks");
+const { buildRuntimeBoard } = require("./runtime-board");
 
 const projectRoot = path.resolve(__dirname, "..");
 const uiRoot = path.join(projectRoot, "ui");
@@ -44,12 +49,44 @@ function readBody(request) {
 
 async function handleApi(request, response, pathname) {
   try {
+    const runtimeActionMatch = /^\/api\/runtime\/tasks\/([^/]+)\/actions$/.exec(pathname);
+
     if (request.method === "GET" && pathname === "/api/config") {
       return sendJson(response, 200, { config: loadExistingConfig(projectRoot) });
     }
 
     if (request.method === "GET" && pathname === "/api/default-config") {
       return sendJson(response, 200, { config: createDefaultConfig() });
+    }
+
+    if (request.method === "GET" && pathname === "/api/runtime-board") {
+      return sendJson(response, 200, buildRuntimeBoard(projectRoot));
+    }
+
+    if (request.method === "POST" && pathname === "/api/runtime/tasks") {
+      const body = await readBody(request);
+      const parsed = JSON.parse(body || "{}");
+      const task = createTask(projectRoot, parsed.task || parsed);
+      return sendJson(response, 200, {
+        ok: true,
+        task,
+        runtimeBoard: buildRuntimeBoard(projectRoot)
+      });
+    }
+
+    if (request.method === "POST" && runtimeActionMatch) {
+      const body = await readBody(request);
+      const parsed = JSON.parse(body || "{}");
+      const tid = decodeURIComponent(runtimeActionMatch[1]);
+      const action = updateTask(projectRoot, {
+        tid,
+        ...(parsed.action || parsed)
+      });
+      return sendJson(response, 200, {
+        ok: true,
+        action,
+        runtimeBoard: buildRuntimeBoard(projectRoot)
+      });
     }
 
     if (request.method === "POST" && pathname === "/api/config") {

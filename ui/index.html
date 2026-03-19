@@ -8,51 +8,637 @@
   </head>
   <body>
     <main class="page">
-      <section class="panel hero">
-        <div class="hero-copy">
-          <p class="eyebrow">OpenCrew x 飞书</p>
-          <h1>角色协作控制台</h1>
-          <p class="lede">
-            先在这里配置角色、飞书群 ID 和生成脚本，再按需同步到 OpenClaw。
-            保存配置不会直接改动现有 agent，只有执行生成脚本时才会落地。
-          </p>
-        </div>
+      <section class="hero-grid">
+        <article class="panel hero-panel">
+          <div class="hero-copy">
+            <p class="eyebrow">OpenCrew x 飞书工作台</p>
+            <h1>角色协作控制台</h1>
+            <p class="lede">
+              用更少步骤完成角色编排、飞书会话绑定与脚本生成。先整理项目和角色，再统一生成
+              apply 脚本并预览结果。
+            </p>
+          </div>
 
-        <div class="hero-steps">
-          <article class="step-card">
-            <span class="step-index">1</span>
+          <div class="hero-flow">
+            <article class="flow-card">
+              <span class="flow-index">01</span>
+              <div>
+                <strong>整理项目设置</strong>
+                <p>把项目名、OpenClaw 命令路径和输出脚本放到同一块配置。</p>
+              </div>
+            </article>
+            <article class="flow-card">
+              <span class="flow-index">02</span>
+              <div>
+                <strong>启用目标角色</strong>
+                <p>只保留真正要落地的角色，未启用的角色不会进入生成结果。</p>
+              </div>
+            </article>
+            <article class="flow-card">
+              <span class="flow-index">03</span>
+              <div>
+                <strong>补齐会话绑定后生成</strong>
+                <p>每个启用角色可填写多个飞书会话 ID，系统会统一生成最终 apply 脚本。</p>
+              </div>
+            </article>
+          </div>
+        </article>
+
+        <aside class="panel snapshot-panel">
+          <div class="panel-head">
             <div>
-              <strong>先配项目</strong>
-              <p>确认项目名、OpenClaw 命令路径，以及最终输出脚本名。</p>
+              <h2>运行快照</h2>
+              <p>先看当前完成度和下一步，再决定是否生成。</p>
             </div>
-          </article>
-          <article class="step-card">
-            <span class="step-index">2</span>
-            <div>
-              <strong>再配角色</strong>
-              <p>启用需要落地的角色，为每个角色填写飞书群 ID。新增角色默认按自定义角色处理。</p>
+            <span class="badge">本地工作台</span>
+          </div>
+
+          <div class="summary-stats">
+            <article class="summary-card">
+              <span class="summary-label">角色总数</span>
+              <strong id="roleCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">已启用</span>
+              <strong id="enabledCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">已配会话</span>
+              <strong id="boundCount">0</strong>
+            </article>
+            <article class="summary-card accent-card">
+              <span class="summary-label">待处理</span>
+              <strong id="attentionCount">0</strong>
+            </article>
+          </div>
+
+          <div class="insight-card">
+            <span class="summary-label">下一步建议</span>
+            <strong id="nextAction">正在加载...</strong>
+            <p id="overviewHint">系统正在读取当前配置。</p>
+          </div>
+
+          <div class="focus-strip">
+            <div class="focus-strip-head">
+              <span>当前启用角色</span>
+              <strong id="readyCount">0</strong>
             </div>
-          </article>
-          <article class="step-card">
-            <span class="step-index">3</span>
-            <div>
-              <strong>最后生成</strong>
-              <p>生成脚本与工作区后，再去执行脚本，把配置同步到 OpenClaw。</p>
-            </div>
-          </article>
-        </div>
+            <div id="activeRoleList" class="chip-list muted-chips"></div>
+          </div>
+        </aside>
       </section>
 
-      <section class="workspace">
-        <article class="panel">
+      <section class="runtime-grid">
+        <article class="panel command-center-panel">
+          <div class="panel-head">
+            <div>
+              <h2>单机器人指挥台</h2>
+              <p>飞书里只有一个可见机器人时，CoS 负责分诊、交接、监工和收口，其他角色作为内部执行阶段存在。</p>
+            </div>
+            <div class="badge-row">
+              <span id="runtimeModeBadge" class="badge">单机器人</span>
+              <span class="badge">TID 驱动</span>
+              <span class="badge">角色接力</span>
+            </div>
+          </div>
+
+          <div class="mini-grid runtime-mini-grid">
+            <article class="mini-card">
+              <span class="summary-label">活跃任务</span>
+              <strong id="runtimeActiveCount">0</strong>
+            </article>
+            <article class="mini-card">
+              <span class="summary-label">阻塞任务</span>
+              <strong id="runtimeBlockedCount">0</strong>
+            </article>
+            <article class="mini-card">
+              <span class="summary-label">待批准</span>
+              <strong id="runtimeWaitingCount">0</strong>
+            </article>
+            <article class="mini-card">
+              <span class="summary-label">范围变化</span>
+              <strong id="runtimeScopeCount">0</strong>
+            </article>
+          </div>
+
+          <div class="panel-subhead">
+            <div>
+              <h3>内部交互链路</h3>
+              <p>一个对外机器人，多个内部角色通过任务块接力。网页会把这条接力链直接展开。</p>
+            </div>
+          </div>
+          <div id="interactionLoop" class="interaction-loop"></div>
+
+          <div class="panel-subhead">
+            <div>
+              <h3>监工规则</h3>
+              <p>总指挥如何发指令、如何拉起人工、什么时候该收口，都在这里固定下来。</p>
+            </div>
+          </div>
+          <div class="logic-list" id="supervisionList"></div>
+
+          <div class="panel-subhead">
+            <div>
+              <h3>当前指挥动作</h3>
+              <p>这里展示 CoS 如何监工、该交给谁，以及下一条结构化指令该怎么发。</p>
+            </div>
+          </div>
+          <div id="taskCommandList" class="task-command-list"></div>
+        </article>
+
+        <aside class="panel robot-panel">
+          <div class="panel-head">
+            <div>
+              <h2>HQ 运行态</h2>
+              <p>机器人动画会跟随当前任务状态切换：空闲、执行、告警。</p>
+            </div>
+          </div>
+
+          <div id="hqStage" class="hq-stage" data-stage="idle">
+            <div class="hq-robot">
+              <div class="bot-head">
+                <span class="bot-eye"></span>
+                <span class="bot-eye"></span>
+                <span class="bot-antenna"></span>
+              </div>
+              <div class="bot-body">
+                <span class="bot-core"></span>
+                <span class="bot-arm left"></span>
+                <span class="bot-arm right"></span>
+              </div>
+              <div class="bot-shadow"></div>
+            </div>
+            <div class="task-orbit">
+              <span class="task-chip orbit-a"></span>
+              <span class="task-chip orbit-b"></span>
+              <span class="task-chip orbit-c"></span>
+            </div>
+            <div class="task-console" aria-hidden="true">
+              <span class="console-line line-a"></span>
+              <span class="console-line line-b"></span>
+              <span class="console-line line-c"></span>
+            </div>
+          </div>
+
+          <div class="stage-copy">
+            <strong id="hqStageHeadline">暂无活跃任务</strong>
+            <p id="hqStageHint">创建 TID 后，这里会显示当前总指挥监工状态。</p>
+          </div>
+
+          <div class="runtime-meta-grid hq-focus-grid">
+            <article class="runtime-meta-card">
+              <span>对外发言</span>
+              <strong id="hqVisibleSpeaker">CoS</strong>
+            </article>
+            <article class="runtime-meta-card">
+              <span>聚焦任务</span>
+              <strong id="hqFocusTid">暂无</strong>
+            </article>
+            <article class="runtime-meta-card">
+              <span>当前执行</span>
+              <strong id="hqFocusRole">暂无</strong>
+            </article>
+            <article class="runtime-meta-card">
+              <span>执行状态</span>
+              <strong id="hqFocusState">空闲</strong>
+            </article>
+          </div>
+
+          <div class="focus-strip hq-role-strip">
+            <div class="focus-strip-head">
+              <span>当前内部执行角色</span>
+              <strong id="hqActiveRoleCount">0</strong>
+            </div>
+            <div id="hqActiveRoles" class="chip-list muted-chips"></div>
+          </div>
+
+          <div class="panel-subhead">
+            <div>
+              <h3>角色执行状态</h3>
+              <p>每张卡都会显示当前角色是否空闲、在规划、执行、阻塞还是待批准。</p>
+            </div>
+          </div>
+          <div id="roleRuntimeBoard" class="role-runtime-grid"></div>
+        </aside>
+      </section>
+
+      <section class="panel live-task-panel">
+        <div class="panel-head">
+          <div>
+            <h2>任务流</h2>
+            <p>根据 `runtime/tasks` 下的 TID 文件自动解析当前负责人、最新进度和建议指令。</p>
+          </div>
+        </div>
+        <div id="taskBoard" class="task-board"></div>
+      </section>
+
+      <section class="runtime-workbench-grid">
+        <article class="panel runtime-workbench-panel">
+          <div class="panel-head">
+            <div>
+              <h2>任务操作台</h2>
+              <p>不离开网页，直接创建 TID、交接角色、写进度、标记阻塞和收口任务。</p>
+            </div>
+            <div class="badge-row">
+              <span class="badge">写入 runtime/tasks</span>
+              <span class="badge">单机器人调度</span>
+            </div>
+          </div>
+
+          <div class="runtime-ops-grid">
+            <article class="runtime-form-card">
+              <div class="panel-subhead">
+                <div>
+                  <h3>新建任务</h3>
+                  <p>适合 CoS 发起中等及以上任务。创建后会自动进入指挥台。</p>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>任务类型</span>
+                  <select id="createTaskType">
+                    <option value="A">A · 执行</option>
+                    <option value="P">P · 项目</option>
+                    <option value="S">S · 高风险</option>
+                    <option value="Q">Q · 简答</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>初始负责人</span>
+                  <select id="createTaskOwner">
+                    <option value="HQ(CoS)">HQ(CoS)</option>
+                    <option value="HQ(CTO)">HQ(CTO)</option>
+                    <option value="HQ(Builder)">HQ(Builder)</option>
+                    <option value="HQ(Ops)">HQ(Ops)</option>
+                    <option value="HQ(KO)">HQ(KO)</option>
+                  </select>
+                </label>
+
+                <label class="field field-span-2">
+                  <span>任务目标</span>
+                  <textarea id="createTaskGoal" rows="3" placeholder="例如：梳理当前飞书群里的角色协作链路，并给出最小改造方案"></textarea>
+                </label>
+
+                <label class="field field-span-2">
+                  <span>验收标准</span>
+                  <textarea id="createTaskAcceptance" rows="3" placeholder="例如：网页能看出 CoS、当前执行角色、阻塞原因和下一步"></textarea>
+                </label>
+
+                <label class="field">
+                  <span>Priority</span>
+                  <select id="createTaskPriority">
+                    <option value="P1">P1</option>
+                    <option value="P2" selected>P2</option>
+                    <option value="P3">P3</option>
+                    <option value="P0">P0</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Dependencies</span>
+                  <input id="createTaskDependsOn" type="text" placeholder="Use commas between TIDs, or leave empty">
+                </label>
+
+                <label class="field field-span-2">
+                  <span>Human Gate</span>
+                  <input id="createTaskHumanGate" type="text" placeholder="Example: CoS approves the plan before Builder starts">
+                </label>
+
+                <label class="field field-span-2">
+                  <span>Checklist</span>
+                  <textarea id="createTaskPlan" rows="4" placeholder="One step per line, or paste - [ ] checklist items"></textarea>
+                </label>
+              </div>
+
+              <div class="runtime-form-actions">
+                <button id="createTaskButton" class="primary" type="button">创建 TID</button>
+              </div>
+
+              <div class="runtime-inline-note">
+                创建后任务会直接写入 `runtime/tasks/`，并自动刷新右侧指挥台与任务流。
+              </div>
+            </article>
+
+            <article class="runtime-form-card">
+              <div class="panel-subhead">
+                <div>
+                  <h3>推进任务</h3>
+                  <p>默认跟随 CoS 当前焦点任务。只有在要强制改写其他 TID 时，才需要手动覆盖。</p>
+                </div>
+              </div>
+
+              <div class="runtime-auto-target">
+                <span class="summary-label">默认作用到</span>
+                <strong id="runtimeAutoTargetTid">暂无焦点任务</strong>
+                <p id="runtimeAutoTargetHint">当前没有活跃任务时，先在左侧创建一个 TID。</p>
+              </div>
+
+              <div class="field-grid compact-field-grid">
+                <label class="field">
+                  <span>动作类型</span>
+                  <select id="runtimeActionMode">
+                    <option value="handoff">Handoff</option>
+                    <option value="checkpoint">Progress</option>
+                    <option value="edit-metadata">Edit Metadata</option>
+                    <option value="toggle-plan">Checklist</option>
+                    <option value="approve">Approve</option>
+                    <option value="reject">Reject</option>
+                    <option value="ops-review">Ops Review</option>
+                    <option value="closeout">Closeout</option>
+                  </select>
+                </label>
+
+                <div class="runtime-follow-card">
+                  <span>任务绑定</span>
+                  <button id="runtimeFollowFocus" class="ghost" type="button">跟随当前焦点</button>
+                </div>
+              </div>
+
+              <div class="focus-strip runtime-target-strip">
+                <div class="focus-strip-head">
+                  <span>覆盖目标任务</span>
+                  <strong id="runtimeTaskTargetCount">0</strong>
+                </div>
+                <div id="runtimeTaskTargets" class="chip-list muted-chips"></div>
+              </div>
+
+              <label class="field runtime-hidden-field">
+                <span>目标任务</span>
+                <select id="runtimeTaskTid"></select>
+              </label>
+
+              <div id="runtimeSelectedTaskSummary" class="runtime-selected-task"></div>
+
+              <div id="runtimeModeHandoff" class="runtime-mode-panel">
+                <div class="field-grid">
+                  <label class="field">
+                    <span>来自</span>
+                    <select id="handoffFrom">
+                      <option value="CoS">CoS</option>
+                      <option value="CTO">CTO</option>
+                      <option value="Builder">Builder</option>
+                      <option value="Ops">Ops</option>
+                      <option value="KO">KO</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>交给</span>
+                    <select id="handoffTo">
+                      <option value="CTO">CTO</option>
+                      <option value="Builder">Builder</option>
+                      <option value="Ops">Ops</option>
+                      <option value="KO">KO</option>
+                      <option value="CoS">CoS</option>
+                    </select>
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>请求</span>
+                    <textarea id="handoffAsk" rows="2" placeholder="例如：收敛范围并给出最小执行计划"></textarea>
+                  </label>
+
+                  <label class="field">
+                    <span>约束</span>
+                    <input id="handoffConstraints" type="text" placeholder="例如：保持单机器人对外口径">
+                  </label>
+
+                  <label class="field">
+                    <span>完成标准</span>
+                    <input id="handoffDoneWhen" type="text" placeholder="例如：一份可直接执行的短计划">
+                  </label>
+                </div>
+              </div>
+
+              <div id="runtimeModeCheckpoint" class="runtime-mode-panel" hidden>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>状态</span>
+                    <select id="checkpointStatus">
+                      <option value="on_track">on_track</option>
+                      <option value="blocked">blocked</option>
+                      <option value="waiting_approval">waiting_approval</option>
+                      <option value="scope_changed">scope_changed</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>人工依赖</span>
+                    <input id="checkpointNeedFromHuman" type="text" placeholder="无则填 none">
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>已完成</span>
+                    <textarea id="checkpointCompleted" rows="2" placeholder="例如：已确认边界并补充执行证据"></textarea>
+                  </label>
+
+                  <label class="field">
+                    <span>下一步</span>
+                    <input id="checkpointNext" type="text" placeholder="例如：交给 Builder 执行">
+                  </label>
+
+                  <label class="field">
+                    <span>风险</span>
+                    <input id="checkpointRisk" type="text" placeholder="无则填 none">
+                  </label>
+                </div>
+              </div>
+
+              <div id="runtimeModeMetadata" class="runtime-mode-panel" hidden>
+                <div class="runtime-inline-note">
+                  ???????? Plan checklist?????????????????????????
+                </div>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>????</span>
+                    <select id="editTaskType">
+                      <option value="A">A ???</option>
+                      <option value="Q">Q ???</option>
+                      <option value="P">P ???</option>
+                      <option value="S">S ???</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>???</span>
+                    <select id="editTaskPriority">
+                      <option value="P0">P0</option>
+                      <option value="P1">P1</option>
+                      <option value="P2">P2</option>
+                      <option value="P3">P3</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>???</span>
+                    <input id="editTaskOwner" type="text" placeholder="???HQ(CTO)">
+                  </label>
+
+                  <label class="field">
+                    <span>?????</span>
+                    <input id="editTaskHumanGate" type="text" placeholder="?????? none">
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>??</span>
+                    <textarea id="editTaskGoal" rows="2" placeholder="??????????????"></textarea>
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>????</span>
+                    <textarea id="editTaskAcceptance" rows="2" placeholder="?? done condition"></textarea>
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>????</span>
+                    <input id="editTaskDependsOn" type="text" placeholder="?? TID ?????????????">
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>Plan checklist</span>
+                    <textarea id="editTaskPlan" rows="5" placeholder="- [ ] First step"></textarea>
+                  </label>
+                </div>
+              </div>
+
+              <div id="runtimeModePlanToggle" class="runtime-mode-panel" hidden>
+                <div class="runtime-inline-note">
+                  ????? checklist ???????????????? Edit Metadata?
+                </div>
+                <div id="planToggleList" class="runtime-plan-toggle-list"></div>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>???</span>
+                    <select id="planToggleIndex"></select>
+                  </label>
+
+                  <label class="field">
+                    <span>????</span>
+                    <select id="planToggleDone">
+                      <option value="todo">todo</option>
+                      <option value="done">done</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div id="runtimeModeApprove" class="runtime-mode-panel" hidden>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>???</span>
+                    <input id="approvalActor" type="text" placeholder="???Human / Ops / PM">
+                  </label>
+
+                  <label class="field">
+                    <span>???</span>
+                    <input id="approvalNext" type="text" placeholder="????? Builder ??">
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>????</span>
+                    <textarea id="approvalNote" rows="2" placeholder="????????????????"></textarea>
+                  </label>
+                </div>
+              </div>
+
+              <div id="runtimeModeReject" class="runtime-mode-panel" hidden>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>???</span>
+                    <input id="rejectActor" type="text" placeholder="???Human / Ops / PM">
+                  </label>
+
+                  <label class="field">
+                    <span>?????</span>
+                    <input id="rejectHumanGate" type="text" placeholder="????????????">
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>????</span>
+                    <textarea id="rejectReason" rows="2" placeholder="???????????"></textarea>
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>?????</span>
+                    <input id="rejectNext" type="text" placeholder="???CoS ?????????">
+                  </label>
+                </div>
+              </div>
+
+              <div id="runtimeModeOpsReview" class="runtime-mode-panel" hidden>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>结论</span>
+                    <select id="opsVerdict">
+                      <option value="pass">pass</option>
+                      <option value="needs_fix">needs_fix</option>
+                    </select>
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>主要关注点</span>
+                    <input id="opsMainConcern" type="text" placeholder="例如：回滚条件还不清晰">
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>需要补救</span>
+                    <input id="opsNeededMitigation" type="text" placeholder="例如：补一条健康检查与回滚步骤">
+                  </label>
+                </div>
+              </div>
+
+              <div id="runtimeModeCloseout" class="runtime-mode-panel" hidden>
+                <div class="field-grid">
+                  <label class="field">
+                    <span>结果</span>
+                    <select id="closeoutOutcome">
+                      <option value="done">done</option>
+                      <option value="cancelled">cancelled</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>剩余风险</span>
+                    <input id="closeoutRisk" type="text" placeholder="无则填 none">
+                  </label>
+
+                  <label class="field field-span-2">
+                    <span>变更内容</span>
+                    <textarea id="closeoutChanged" rows="2" placeholder="例如：完成运行态看板、监工链路和动画"></textarea>
+                  </label>
+
+                  <label class="field">
+                    <span>证据</span>
+                    <input id="closeoutEvidence" type="text" placeholder="例如：API 校验通过，页面渲染正常">
+                  </label>
+
+                  <label class="field">
+                    <span>下一步</span>
+                    <input id="closeoutNext" type="text" placeholder="例如：如需扩展，再由 CoS 开新 TID">
+                  </label>
+                </div>
+              </div>
+
+              <div class="runtime-form-actions">
+                <button id="applyRuntimeAction" class="primary" type="button">写入任务动作</button>
+              </div>
+            </article>
+          </div>
+        </article>
+      </section>
+
+      <section class="workspace-grid">
+        <article class="panel project-panel">
           <div class="panel-head">
             <div>
               <h2>项目设置</h2>
-              <p>这里保存的是控制台配置，不会直接创建角色。</p>
+              <p>这里保存的是控制台配置，不会直接创建或覆盖现有 agent。</p>
             </div>
             <div class="badge-row">
               <span class="badge">本地配置</span>
-              <span class="badge">飞书绑定</span>
+              <span class="badge">脚本生成</span>
             </div>
           </div>
 
@@ -70,14 +656,27 @@
               <input id="outputScriptName" type="text" placeholder="apply-opencrew-feishu.generated.ps1">
             </label>
           </div>
+        </article>
 
-          <div class="action-bar">
-            <button id="saveConfig" class="ghost" type="button">保存配置</button>
-            <button id="resetDefaults" class="ghost" type="button">恢复默认模板</button>
-            <button id="generateAssets" class="primary" type="button">生成脚本与工作区</button>
+        <article class="panel action-panel">
+          <div class="panel-head">
+            <div>
+              <h2>操作中心</h2>
+              <p>保存、导入导出与生成预览都集中在这里。</p>
+            </div>
+            <div class="badge-row">
+              <span class="badge">导入 / 导出</span>
+              <span class="badge">生成预览</span>
+            </div>
           </div>
 
-          <div class="action-bar">
+          <div class="action-cluster">
+            <button id="generateAssets" class="primary" type="button">生成脚本与工作区</button>
+            <button id="saveConfig" class="ghost" type="button">保存配置</button>
+            <button id="resetDefaults" class="ghost" type="button">恢复默认模板</button>
+          </div>
+
+          <div class="action-cluster secondary">
             <button id="downloadConfig" class="ghost" type="button">导出配置 JSON</button>
             <button id="downloadScript" class="ghost" type="button">下载生成脚本</button>
             <label class="ghost file-button">
@@ -86,53 +685,57 @@
             </label>
           </div>
 
-          <div id="statusBar" class="status">正在加载配置...</div>
-        </article>
-
-        <aside class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>当前概览</h2>
-              <p>先用模板起步，再把真正需要的业务角色扩展成自定义角色。</p>
-            </div>
-          </div>
-
-          <div class="summary-stats">
-            <article class="summary-card">
-              <span class="summary-label">角色总数</span>
-              <strong id="roleCount">0</strong>
+          <div class="mini-grid">
+            <article class="mini-card">
+              <span class="summary-label">预置模板</span>
+              <strong id="builtinCount">0</strong>
             </article>
-            <article class="summary-card">
-              <span class="summary-label">已启用</span>
-              <strong id="enabledCount">0</strong>
-            </article>
-            <article class="summary-card">
-              <span class="summary-label">已填群 ID</span>
-              <strong id="boundCount">0</strong>
-            </article>
-            <article class="summary-card">
+            <article class="mini-card">
               <span class="summary-label">自定义角色</span>
               <strong id="customCount">0</strong>
             </article>
+            <article class="mini-card">
+              <span class="summary-label">已就绪角色</span>
+              <strong id="readyCountInline">0</strong>
+            </article>
+            <article class="mini-card">
+              <span class="summary-label">启用覆盖率</span>
+              <strong id="coverageRate">0%</strong>
+            </article>
           </div>
 
-          <ul class="plain-list">
-            <li>预置模板用于保留 OpenCrew 的协作骨架，自定义角色用于承接你的业务边界。</li>
-            <li>飞书绑定只需要填写群 ID，系统生成脚本时会自动补上 <code>feishu:</code>。</li>
-            <li>预置模板内容默认锁定；如果你要改职责边界，切换为“自定义角色”即可。</li>
-            <li>新增或复制出来的自定义角色默认不启用，避免误绑定到错误群。</li>
-          </ul>
-        </aside>
+          <div id="statusBar" class="status">正在加载配置...</div>
+        </article>
       </section>
 
-      <section class="panel">
+      <section class="panel roles-panel">
         <div class="panel-head">
           <div>
             <h2>角色配置</h2>
-            <p>这里决定哪些角色会真正生成工作区并绑定到飞书。</p>
+            <p>每个角色都是一张独立卡片。先决定是否启用，再补齐会话绑定与职责边界。</p>
           </div>
           <button id="addRole" class="primary" type="button">新增自定义角色</button>
         </div>
+
+        <div class="role-summary-bar">
+          <article class="mini-card">
+            <span class="summary-label">总角色</span>
+            <strong id="roleCountInline">0</strong>
+          </article>
+          <article class="mini-card">
+            <span class="summary-label">已绑定</span>
+            <strong id="boundCountInline">0</strong>
+          </article>
+          <article class="mini-card">
+            <span class="summary-label">待补会话</span>
+            <strong id="attentionCountInline">0</strong>
+          </article>
+          <article class="mini-card">
+            <span class="summary-label">自定义占比</span>
+            <strong id="customRate">0%</strong>
+          </article>
+        </div>
+
         <div id="roleList" class="role-list"></div>
       </section>
 
@@ -141,7 +744,7 @@
           <div class="panel-head">
             <div>
               <h2>配置预览</h2>
-              <p>保存前可以先确认 JSON 结构是否符合你的预期。</p>
+              <p>保存前先确认 JSON 结构是否符合预期。</p>
             </div>
           </div>
           <pre id="configPreview" class="code-block"></pre>
@@ -163,87 +766,108 @@
       <article class="role-card">
         <div class="role-card-head">
           <div class="role-card-title">
-            <div>
+            <div class="role-heading-row">
               <h3 class="role-heading"></h3>
-              <p class="role-caption"></p>
+              <span class="role-chip role-kind"></span>
+              <span class="role-chip role-state"></span>
+              <span class="role-chip role-binding-state"></span>
             </div>
+            <p class="role-caption"></p>
           </div>
+
           <div class="role-card-actions">
             <label class="toggle">
               <input class="role-enabled" type="checkbox">
               <span>启用</span>
             </label>
-            <span class="role-chip role-kind"></span>
+            <button class="ghost toggle-role-detail" type="button">展开详情</button>
             <button class="ghost duplicate-role" type="button">复制为自定义</button>
             <button class="danger remove-role" type="button">删除</button>
           </div>
         </div>
 
-        <div class="notice builtin-notice">
-          当前是预置模板。要改角色边界，请切换成“自定义角色”或直接复制一份。
-        </div>
+        <div class="role-detail-body" hidden>
+          <div class="notice builtin-notice">
+            当前是预置模板。要改角色边界，请切换成“自定义角色”或直接复制一份。
+          </div>
 
-        <div class="field-grid">
-          <label class="field">
-            <span>角色模式</span>
-            <select class="role-mode">
-              <option value="builtin">预置模板</option>
-              <option value="custom">自定义角色</option>
-            </select>
-          </label>
+          <div class="role-glance">
+            <article class="glance-card">
+              <span>角色 ID</span>
+              <strong class="role-id-preview"></strong>
+            </article>
+            <article class="glance-card">
+              <span>来源</span>
+              <strong class="role-preset-preview"></strong>
+            </article>
+            <article class="glance-card">
+              <span>会话绑定</span>
+              <strong class="role-binding-preview"></strong>
+            </article>
+          </div>
 
-          <label class="field">
-            <span>预置模板</span>
-            <select class="role-preset">
-              <option value="cos">协作指挥官</option>
-              <option value="cto">技术负责人</option>
-              <option value="builder">执行构建师</option>
-              <option value="ko">知识运营</option>
-              <option value="ops">流程运营</option>
-            </select>
-          </label>
+          <div class="field-grid">
+            <label class="field">
+              <span>角色模式</span>
+              <select class="role-mode">
+                <option value="builtin">预置模板</option>
+                <option value="custom">自定义角色</option>
+              </select>
+            </label>
 
-          <label class="field">
-            <span>角色 ID</span>
-            <input class="role-id" type="text" placeholder="建议使用英文字母、数字和短横线">
-          </label>
+            <label class="field">
+              <span>预置模板</span>
+              <select class="role-preset">
+                <option value="cos">协作指挥官</option>
+                <option value="cto">技术负责人</option>
+                <option value="builder">执行构建师</option>
+                <option value="ko">知识运营</option>
+                <option value="ops">流程运营</option>
+              </select>
+            </label>
 
-          <label class="field">
-            <span>显示名称</span>
-            <input class="role-name" type="text" placeholder="例如：财务机器人">
-          </label>
+            <label class="field">
+              <span>角色 ID</span>
+              <input class="role-id" type="text" placeholder="建议使用英文字母、数字和短横线">
+            </label>
 
-          <label class="field field-span-2">
-            <span>飞书群 ID</span>
-            <input class="role-binding" type="text" placeholder="只填群 ID，不要带 feishu:">
-            <small>只有启用的角色才要求填写飞书群 ID。</small>
-          </label>
+            <label class="field">
+              <span>显示名称</span>
+              <input class="role-name" type="text" placeholder="例如：财务机器人">
+            </label>
 
-          <label class="field">
-            <span>角色代号</span>
-            <input class="role-emoji" type="text" placeholder="例如：FIN">
-          </label>
+            <label class="field field-span-2">
+              <span>飞书会话 ID</span>
+              <textarea class="role-bindings" rows="3" placeholder="每行一个会话 ID，不要带 feishu:"></textarea>
+              <small>只有启用的角色才要求至少填写一个会话 ID；一个角色可绑定多个会话。</small>
+            </label>
 
-          <label class="field">
-            <span>角色定位</span>
-            <input class="role-title-input" type="text" placeholder="例如：财务结算与对账负责人">
-          </label>
+            <label class="field">
+              <span>角色代号</span>
+              <input class="role-emoji" type="text" placeholder="例如：FIN">
+            </label>
 
-          <label class="field field-span-2">
-            <span>工作风格</span>
-            <input class="role-vibe" type="text" placeholder="例如：重视准确率、口径一致、留痕清晰">
-          </label>
+            <label class="field">
+              <span>角色定位</span>
+              <input class="role-title-input" type="text" placeholder="例如：财务结算与对账负责人">
+            </label>
 
-          <label class="field field-span-2">
-            <span>使命</span>
-            <textarea class="role-mission" rows="3" placeholder="这个角色需要对什么结果负责"></textarea>
-          </label>
+            <label class="field field-span-2">
+              <span>工作风格</span>
+              <input class="role-vibe" type="text" placeholder="例如：重视准确率、口径一致、留痕清晰">
+            </label>
 
-          <label class="field field-span-2">
-            <span>职责清单</span>
-            <textarea class="role-responsibilities" rows="5" placeholder="每行一条职责"></textarea>
-            <small>生成工作区时，这里的内容会写入角色的说明文件。</small>
-          </label>
+            <label class="field field-span-2">
+              <span>使命</span>
+              <textarea class="role-mission" rows="3" placeholder="这个角色需要对什么结果负责"></textarea>
+            </label>
+
+            <label class="field field-span-2">
+              <span>职责清单</span>
+              <textarea class="role-responsibilities" rows="5" placeholder="每行一条职责"></textarea>
+              <small>生成工作区时，这里的内容会写入角色说明文件。</small>
+            </label>
+          </div>
         </div>
       </article>
     </template>

@@ -1,42 +1,62 @@
-# HQ 任务示例
+# TID-20260318-1400-runtime-example
 
-TID: TID-20260313-1600-feishu-opencrew
-类型: A
-负责人: HQ(CoS/Builder)
-目标: 准备最小可用的飞书适配 scaffold
-验收: 文件存在、辅助脚本验证通过、现网路由未被触碰
-状态: done
-CreatedAt: 2026-03-13T16:00:00+08:00
+TID: TID-20260318-1400-runtime-example
+Type: P
+Priority: P1
+Owner: HQ(Builder)
+Goal: Surface task state, owner, and audit history in the runtime board
+Acceptance: The board shows owner, state, dependencies, recent events, and next step
+DependsOn: none
+HumanGate: none
+State: active
+CreatedAt: 2026-03-18T14:00:00+08:00
+UpdatedAt: 2026-03-18T14:14:00+08:00
 
-## 背景
+## Context
 
-- 当前基线是单 agent 的本地 OpenClaw
-- 飞书通道已经配置好
-- 还没有专属角色群 ID
+- One visible CoS bot supervises internal roles through task files.
+- The runtime board should stay useful even if the latest header snapshot becomes stale.
 
-## 计划
+## Plan
 
-- 添加共享协议文件
-- 添加角色工作区模板
-- 添加后续绑定生成器
-- 让主工作区在共享飞书场景读取 HQ 协议
+- [x] Define the task header and initial checklist
+- [x] Handoff planning to CTO
+- [x] Move execution to Builder
+- [ ] Render the latest audit event in the board
 
-## 最新进度
+## Latest Progress
 
-TID: TID-20260313-1600-feishu-opencrew
-进度:
-- 状态: on_track
-- 已完成: 共享协议文件和角色模板已创建
-- 下一步: 增加辅助脚本并完成一次干运行验证
-- 风险: PowerShell 执行策略可能阻止脚本直接运行
-- 需要人工: none
+Handoff:
+- From: CoS
+- To: CTO
+- TID: TID-20260318-1400-runtime-example
+- Ask: Scope the runtime board changes and write the minimum executable checklist
+- Constraints: Keep one visible external bot and short replies
+- Done When: A short plan and a clear next owner
 
-## 结项
+Handoff:
+- From: CTO
+- To: Builder
+- TID: TID-20260318-1400-runtime-example
+- Ask: Implement the task-card and selected-task runtime details
+- Constraints: Keep the task parser backward compatible
+- Done When: The board reflects state, owner, dependencies, and recent audit events
 
-TID: TID-20260313-1600-feishu-opencrew
-结项:
-- 结果: done
-- 变更内容: scaffold 已创建、生成器已加入、主工作区已接入 HQ 协议
-- 证据: 脚本语法解析通过，生成器干运行产出了应用脚本
-- 剩余风险: 真正的多角色绑定仍然需要实际飞书角色群 ID
-- 下一步: 当群 ID 明确后，绑定 `CoS`、`CTO` 和 `Builder`
+TID: TID-20260318-1400-runtime-example
+Progress:
+- Status: on_track
+- Completed: Added event-log parsing and selected-task summaries
+- Next: Render recent audit events directly in the runtime board
+- Risk: none
+- Need From Human: none
+
+## Event Log
+
+{"ts":"2026-03-18T14:00:00+08:00","mode":"create","tid":"TID-20260318-1400-runtime-example","previousState":"none","type":"P","state":"triage","owner":"HQ(CoS)","priority":"P1","goal":"Surface task state, owner, and audit history in the runtime board","acceptance":"The board shows owner, state, dependencies, recent events, and next step","humanGate":"none","dependsOn":[],"planDoneCount":0,"planTotal":4,"summary":"Created task, owner HQ(CoS), priority P1"}
+{"ts":"2026-03-18T14:03:00+08:00","mode":"handoff","tid":"TID-20260318-1400-runtime-example","previousState":"triage","type":"P","state":"active","owner":"HQ(CTO)","priority":"P1","goal":"Surface task state, owner, and audit history in the runtime board","acceptance":"The board shows owner, state, dependencies, recent events, and next step","humanGate":"none","dependsOn":[],"planDoneCount":1,"planTotal":4,"summary":"Handoff: CoS -> CTO","from":"CoS","to":"CTO"}
+{"ts":"2026-03-18T14:08:00+08:00","mode":"handoff","tid":"TID-20260318-1400-runtime-example","previousState":"active","type":"P","state":"active","owner":"HQ(Builder)","priority":"P1","goal":"Surface task state, owner, and audit history in the runtime board","acceptance":"The board shows owner, state, dependencies, recent events, and next step","humanGate":"none","dependsOn":[],"planDoneCount":2,"planTotal":4,"summary":"Handoff: CTO -> Builder","from":"CTO","to":"Builder"}
+{"ts":"2026-03-18T14:14:00+08:00","mode":"checkpoint","tid":"TID-20260318-1400-runtime-example","previousState":"active","type":"P","state":"active","owner":"HQ(Builder)","priority":"P1","goal":"Surface task state, owner, and audit history in the runtime board","acceptance":"The board shows owner, state, dependencies, recent events, and next step","humanGate":"none","dependsOn":[],"planDoneCount":3,"planTotal":4,"summary":"Checkpoint: on_track","status":"on_track"}
+
+## Closeout
+
+_pending_
