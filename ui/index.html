@@ -455,21 +455,21 @@
 
               <div id="runtimeModeMetadata" class="runtime-mode-panel" hidden>
                 <div class="runtime-inline-note">
-                  ???????? Plan checklist?????????????????????????
+                  这里会改任务头信息和 Plan checklist；不会追加新的运行时事件块。
                 </div>
                 <div class="field-grid">
                   <label class="field">
-                    <span>????</span>
+                    <span>任务类型</span>
                     <select id="editTaskType">
-                      <option value="A">A ???</option>
-                      <option value="Q">Q ???</option>
-                      <option value="P">P ???</option>
-                      <option value="S">S ???</option>
+                      <option value="A">A 路 执行</option>
+                      <option value="Q">Q 路 简答</option>
+                      <option value="P">P 路 项目</option>
+                      <option value="S">S 路 高风险</option>
                     </select>
                   </label>
 
                   <label class="field">
-                    <span>???</span>
+                    <span>优先级</span>
                     <select id="editTaskPriority">
                       <option value="P0">P0</option>
                       <option value="P1">P1</option>
@@ -479,28 +479,28 @@
                   </label>
 
                   <label class="field">
-                    <span>???</span>
-                    <input id="editTaskOwner" type="text" placeholder="???HQ(CTO)">
+                    <span>负责人</span>
+                    <input id="editTaskOwner" type="text" placeholder="例如：HQ(CTO)">
                   </label>
 
                   <label class="field">
-                    <span>?????</span>
-                    <input id="editTaskHumanGate" type="text" placeholder="?????? none">
+                    <span>人工审批点</span>
+                    <input id="editTaskHumanGate" type="text" placeholder="没有就填 none">
                   </label>
 
                   <label class="field field-span-2">
-                    <span>??</span>
-                    <textarea id="editTaskGoal" rows="2" placeholder="??????????????"></textarea>
+                    <span>任务目标</span>
+                    <textarea id="editTaskGoal" rows="2" placeholder="直接修改当前任务目标"></textarea>
                   </label>
 
                   <label class="field field-span-2">
-                    <span>????</span>
-                    <textarea id="editTaskAcceptance" rows="2" placeholder="?? done condition"></textarea>
+                    <span>验收标准</span>
+                    <textarea id="editTaskAcceptance" rows="2" placeholder="写清 done condition"></textarea>
                   </label>
 
                   <label class="field field-span-2">
-                    <span>????</span>
-                    <input id="editTaskDependsOn" type="text" placeholder="?? TID ?????????????">
+                    <span>依赖任务</span>
+                    <input id="editTaskDependsOn" type="text" placeholder="多个 TID 用逗号分隔">
                   </label>
 
                   <label class="field field-span-2">
@@ -512,17 +512,17 @@
 
               <div id="runtimeModePlanToggle" class="runtime-mode-panel" hidden>
                 <div class="runtime-inline-note">
-                  ????? checklist ???????????????? Edit Metadata?
+                  这里只切换 checklist 勾选状态；批量改计划内容请回到 Edit Metadata。
                 </div>
                 <div id="planToggleList" class="runtime-plan-toggle-list"></div>
                 <div class="field-grid">
                   <label class="field">
-                    <span>???</span>
+                    <span>清单项</span>
                     <select id="planToggleIndex"></select>
                   </label>
 
                   <label class="field">
-                    <span>????</span>
+                    <span>勾选状态</span>
                     <select id="planToggleDone">
                       <option value="todo">todo</option>
                       <option value="done">done</option>
@@ -534,18 +534,18 @@
               <div id="runtimeModeApprove" class="runtime-mode-panel" hidden>
                 <div class="field-grid">
                   <label class="field">
-                    <span>???</span>
-                    <input id="approvalActor" type="text" placeholder="???Human / Ops / PM">
+                    <span>批准人</span>
+                    <input id="approvalActor" type="text" placeholder="例如：Human / Ops / PM">
                   </label>
 
                   <label class="field">
-                    <span>???</span>
-                    <input id="approvalNext" type="text" placeholder="????? Builder ??">
+                    <span>批准后下一步</span>
+                    <input id="approvalNext" type="text" placeholder="例如：继续交给 Builder 执行">
                   </label>
 
                   <label class="field field-span-2">
-                    <span>????</span>
-                    <textarea id="approvalNote" rows="2" placeholder="????????????????"></textarea>
+                    <span>批准说明</span>
+                    <textarea id="approvalNote" rows="2" placeholder="记录本次批准的条件或范围"></textarea>
                   </label>
                 </div>
               </div>
@@ -553,23 +553,23 @@
               <div id="runtimeModeReject" class="runtime-mode-panel" hidden>
                 <div class="field-grid">
                   <label class="field">
-                    <span>???</span>
-                    <input id="rejectActor" type="text" placeholder="???Human / Ops / PM">
+                    <span>驳回人</span>
+                    <input id="rejectActor" type="text" placeholder="例如：Human / Ops / PM">
                   </label>
 
                   <label class="field">
-                    <span>?????</span>
-                    <input id="rejectHumanGate" type="text" placeholder="????????????">
+                    <span>新的人工审批点</span>
+                    <input id="rejectHumanGate" type="text" placeholder="例如：补证据后重新审批">
                   </label>
 
                   <label class="field field-span-2">
-                    <span>????</span>
-                    <textarea id="rejectReason" rows="2" placeholder="???????????"></textarea>
+                    <span>驳回原因</span>
+                    <textarea id="rejectReason" rows="2" placeholder="写清为什么不能继续"></textarea>
                   </label>
 
                   <label class="field field-span-2">
-                    <span>?????</span>
-                    <input id="rejectNext" type="text" placeholder="???CoS ?????????">
+                    <span>驳回后下一步</span>
+                    <input id="rejectNext" type="text" placeholder="例如：由 CoS 重新收敛并再次提交">
                   </label>
                 </div>
               </div>

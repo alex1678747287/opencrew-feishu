@@ -118,6 +118,18 @@ test("sample config stays parseable and matches builtin default role ids", () =>
   );
 });
 
+test("package metadata stays aligned with the public repository", () => {
+  const repoRoot = path.join(__dirname, "..");
+  const packagePath = path.join(repoRoot, "package.json");
+  const pkg = JSON.parse(fs.readFileSync(packagePath, "utf8"));
+
+  assert.equal(pkg.license, "MIT");
+  assert.equal(pkg.homepage, "https://github.com/alex1678747287/opencrew-feishu");
+  assert.equal(pkg.repository?.type, "git");
+  assert.equal(pkg.repository?.url, "git+https://github.com/alex1678747287/opencrew-feishu.git");
+  assert.equal(pkg.bugs?.url, "https://github.com/alex1678747287/opencrew-feishu/issues");
+});
+
 test("runtime and scaffold prompt docs stay ASCII-safe and preserve the CoS identity shortcut", () => {
   const repoRoot = path.join(__dirname, "..");
   const markdownFiles = [

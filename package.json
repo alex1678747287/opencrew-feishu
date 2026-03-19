@@ -3,7 +3,16 @@
   "version": "0.1.0",
   "description": "Local control studio for OpenCrew-style Feishu workflows on top of OpenClaw.",
   "private": true,
+  "license": "MIT",
   "type": "commonjs",
+  "homepage": "https://github.com/alex1678747287/opencrew-feishu",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alex1678747287/opencrew-feishu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alex1678747287/opencrew-feishu/issues"
+  },
   "keywords": [
     "opencrew",
     "feishu",
