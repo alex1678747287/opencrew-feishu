@@ -2,7 +2,7 @@
 
 Local control studio for running an OpenCrew-style workflow on top of OpenClaw and Feishu.
 
-Chinese documentation: [`docs/README.zh-CN.md`](docs/README.zh-CN.md)
+Chinese documentation: [`README.zh-CN.md`](README.zh-CN.md)
 
 This repo gives you:
 
